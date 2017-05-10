@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.4
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BestMUD", "BestMUD\BestMUD.csproj", "{AE0C543A-507B-4533-992D-2DE9C6E080D8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Networking", "Networking\Networking.csproj", "{1D77C062-A8BA-47E7-81DA-C5AF01080FB0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities\Utilities.csproj", "{2D9488B6-935D-4E72-989C-898968FBC927}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{1D77C062-A8BA-47E7-81DA-C5AF01080FB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D77C062-A8BA-47E7-81DA-C5AF01080FB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1D77C062-A8BA-47E7-81DA-C5AF01080FB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D9488B6-935D-4E72-989C-898968FBC927}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D9488B6-935D-4E72-989C-898968FBC927}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D9488B6-935D-4E72-989C-898968FBC927}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D9488B6-935D-4E72-989C-898968FBC927}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

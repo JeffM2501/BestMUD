@@ -25,6 +25,7 @@ namespace Networking
                 return false;
 
             TcpListener listener = new TcpListener(IPAddress.Any, port);
+            listener.Start();
             listener.BeginAcceptTcpClient(ListenAcceptTCPClient, listener);
             ListenPorts.Add(port, listener);
 

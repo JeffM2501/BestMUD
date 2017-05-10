@@ -128,6 +128,7 @@ namespace Networking
 
                             byte[] buffer = System.Text.Encoding.ASCII.GetBytes(sb.ToString());
                             con.DataStream.Write(buffer, 0, buffer.Length);
+                            con.DataStream.FlushAsync();
 
                             if (con.HasOutboundData())
                                 oneHadPending = true;

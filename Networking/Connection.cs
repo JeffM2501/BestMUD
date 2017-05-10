@@ -17,6 +17,8 @@ namespace Networking
 
         public object ProtocolTag = null;
 
+        protected readonly bool DebugEcho = true;
+
 
         public Connection(TcpClient soc)
         {
@@ -31,6 +33,9 @@ namespace Networking
 
             lock (InboundMessages)
                 InboundMessages.Add(msg);
+
+            if (DebugEcho)
+                SendOutboundMessage(msg);
         }
 
         public string PopInboundMessage()

@@ -19,11 +19,60 @@ namespace Networking
 
         protected readonly bool DebugEcho = true;
 
+        public object MessageProcessorTag { get; protected set; }
+
+        protected Dictionary<string, object> MessageProcessorTags = new Dictionary<string, object>();
+
+        public IMessageProcessor MessageProcessor { get; protected set; }
+
 
         public Connection(TcpClient soc)
         {
+            MessageProcessorTag = null;
+            MessageProcessor = null;
             Socket = soc;
             DataStream = Socket.GetStream();
+        }
+
+        public void SetMessageProcessor(IMessageProcessor processor)
+        {
+            if (MessageProcessor != null)
+                MessageProcessor.ProcessorDetatch(this);
+
+            MessageProcessor = processor;
+            if (MessageProcessor != null)
+                MessageProcessor.ProcessorAttach(this);
+        }
+
+        public void SetMessageProcessorTag(string name, object tag)
+        {
+            if (MessageProcessorTags.ContainsKey(name))
+                MessageProcessorTags[name] = tag;
+            else
+                MessageProcessorTags.Add(name, tag);
+
+            MessageProcessorTag = tag;
+        }
+
+        public void SetMessageProcessorTag(string name)
+        {
+            if (MessageProcessorTags.ContainsKey(name))
+                MessageProcessorTag = MessageProcessorTags[name];
+            else
+                MessageProcessorTag = null;
+        }
+
+        public object GetMesssageProcessorTag(string name)
+        {
+            if (MessageProcessorTags.ContainsKey(name))
+                return MessageProcessorTags[name];
+            else
+                return null;
+        }
+
+        public T GetMesssageProcessorTag<T>() where T: class
+        {
+            return MessageProcessorTag as T;
         }
 
         public void PushInboundMessage(string msg)
@@ -33,6 +82,9 @@ namespace Networking
 
             lock (InboundMessages)
                 InboundMessages.Add(msg);
+
+            if (MessageProcessor != null)
+                MessageProcessor.ProcessInbound(msg, this);
 
             if (DebugEcho)
                 SendOutboundMessage(msg);

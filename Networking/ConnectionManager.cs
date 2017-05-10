@@ -12,6 +12,7 @@ namespace Networking
     public class ConnectionManager
     {
         protected IProtocol ProtcolProcessor = null;
+        protected IMessageProcessorFactory DefaultProcessorFactory = null;
 
         protected List<Connection> ActiveConnections = new List<Connection>();
 
@@ -24,9 +25,10 @@ namespace Networking
         protected readonly int MaxReadCountPerCycle = 5;
         protected readonly int MaxWriteCountPerCycle = 5;
 
-        public ConnectionManager(IProtocol protocol, int maxCount)
+        public ConnectionManager(IProtocol protocol, IMessageProcessorFactory factory, int maxCount)
         {
             ProtcolProcessor = protocol;
+            DefaultProcessorFactory = factory;
             MaxConnections = maxCount;
         }
 
@@ -44,9 +46,14 @@ namespace Networking
                     return false;
 
                 var con = new Connection(client);
+                con.SetMessageProcessor(DefaultProcessorFactory.CreateMessageProcessor(con));
+
                 ProtcolProcessor.AddConnection(con); // let the protocol processor setup any data needed for the connection
 
                 ActiveConnections.Add(con);  // TO DO, add a message processor here
+
+                if (con.MessageProcessor != null)
+                    con.MessageProcessor.ProcessAccept(con);
             }
 
             lock(DataLocker)    // make sure our data read/write thread is running
@@ -87,7 +94,9 @@ namespace Networking
                     if (!con.Socket.Connected)
                     {
                         ProtcolProcessor.RemoveConnection(con);
-                        // tell someone that they died
+                        if (con.MessageProcessor != null)
+                            con.MessageProcessor.ProcessDisconnect(con);
+
                         lock (ActiveConnections)
                             ActiveConnections.Remove(con);
                     }

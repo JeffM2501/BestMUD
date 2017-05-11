@@ -9,6 +9,8 @@ namespace Utilities
 {
     public class Logger
     {
+        public static bool EchoToConsole = true;
+
         public static bool LogsInUTC = true;
 
         protected StreamWriter LogStream = null;
@@ -82,9 +84,11 @@ namespace Utilities
 
             data += entry;
 
-            LogStream.Write(Decorator.LogDecorate(data));
+            string line = Decorator.LogDecorate(data);
+            LogStream.Write(line);
 
             LogStream.Flush();
+            Console.WriteLine(line);
         }
     }
 }

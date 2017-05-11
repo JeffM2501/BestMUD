@@ -9,7 +9,7 @@ namespace Telnet
 {
     public class ProtocolProcessor : IProtocol
     {
-        protected readonly char[] NewlineArray = "\r".ToCharArray();
+        protected readonly char[] NewlineArray = "\n".ToCharArray();
 
         public void AddConnection(Connection con)
         {
@@ -92,10 +92,6 @@ namespace Telnet
                     {
                         if (c == '\n')
                             builder.Append('\r');
-                        else if (c == '\r')
-                        {
-                            int q = 20;
-                        }
                         builder.Append(c);
                     }
                 }
@@ -103,23 +99,14 @@ namespace Telnet
             if (builder.Length > 0)
                 codes.Add(builder.ToString());
 
-            string debugString = string.Empty;
             foreach (var c in codes)
             {
                 if (c == string.Empty)
                     continue;
                 if (c[0] == '<' && c[c.Length - 1] == '>')
-                {
-                    string code = TelnetColors.TranslateBMCode(c);
-                    debugString += code;
-                    buffer.Append(code);
-                }
+                    buffer.Append(TelnetColors.TranslateBMCode(c));
                 else
-                {
-                    debugString += c;
                     buffer.Append(c);
-                }
-                    
             }
 
             buffer.Append("\r\n");

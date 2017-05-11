@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Networking
 {
-    public class Connection
+    public class Connection : EventArgs
     {
         public TcpClient Socket = null;
         public NetworkStream DataStream = null;
@@ -103,6 +103,12 @@ namespace Networking
                 InboundMessages.RemoveAt(0);
                 return msg;
             }
+        }
+
+        public bool HasPendingInbound()
+        {
+            lock (InboundMessages)
+                return InboundMessages.Count > 0;
         }
 
         public void SendOutboundMessage(string msg)

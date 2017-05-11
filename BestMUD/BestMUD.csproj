@@ -50,6 +50,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{7c8bcebe-1c10-48cb-a2fd-d267864e032f}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Networking\Networking.csproj">
       <Project>{1d77c062-a8ba-47e7-81da-c5af01080fb0}</Project>
       <Name>Networking</Name>

@@ -47,7 +47,7 @@ namespace Telnet
                     {
                         if (c == 127 && builder.Length > 0)
                             builder.Remove(builder.Length - 1, 1);
-                        else
+                        else if (c >= 32 && c < 127)
                             builder.Append(c);
                     }
 
@@ -60,6 +60,9 @@ namespace Telnet
 
         public bool TranslateOutbound(string text, StringBuilder buffer, Connection con)
         {
+            // todo process colors
+
+
             buffer.AppendLine(text);
           //  buffer.Append("\r\n");
             return true;

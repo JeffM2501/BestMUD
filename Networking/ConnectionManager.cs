@@ -12,7 +12,7 @@ namespace Networking
     public class ConnectionManager
     {
         protected IProtocol ProtcolProcessor = null;
-        protected IMessageProcessorFactory DefaultProcessorFactory = null;
+      
 
         protected List<Connection> ActiveConnections = new List<Connection>();
 
@@ -25,7 +25,10 @@ namespace Networking
         protected readonly int MaxReadCountPerCycle = 5;
         protected readonly int MaxWriteCountPerCycle = 5;
 
-        public ConnectionManager(IProtocol protocol, IMessageProcessorFactory factory, int maxCount)
+        public delegate IMessageProcessor GetMessageProcessorCallback(Connection c);
+        protected GetMessageProcessorCallback DefaultProcessorFactory = null;
+
+        public ConnectionManager(IProtocol protocol, GetMessageProcessorCallback factory, int maxCount)
         {
             ProtcolProcessor = protocol;
             DefaultProcessorFactory = factory;
@@ -46,7 +49,7 @@ namespace Networking
                     return false;
 
                 var con = new Connection(client);
-                con.SetMessageProcessor(DefaultProcessorFactory.CreateMessageProcessor(con));
+                con.SetMessageProcessor(DefaultProcessorFactory(con));
 
                 ProtcolProcessor.AddConnection(con); // let the protocol processor setup any data needed for the connection
 
@@ -135,7 +138,8 @@ namespace Networking
                             foreach(var m in messages)
                                 ProtcolProcessor.TranslateOutbound(m, sb, con);
 
-                            byte[] buffer = System.Text.Encoding.ASCII.GetBytes(sb.ToString());
+                            string data = sb.ToString();
+                            byte[] buffer = System.Text.Encoding.ASCII.GetBytes(data);
                             con.DataStream.Write(buffer, 0, buffer.Length);
                             con.DataStream.FlushAsync();
 

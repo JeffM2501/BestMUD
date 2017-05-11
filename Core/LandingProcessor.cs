@@ -1,18 +1,26 @@
 ﻿using Networking;
+using Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Core
 {
-    public class LandingProcessor : IMessageProcessor, IMessageProcessorFactory
+    public class LandingProcessor : IMessageProcessor
     {
-        public void ProcessAccept(Connection con)
+        protected DirectoryInfo DataPath = null;
+
+        public void SetDataPath(string path)
         {
+            DataPath = new DirectoryInfo(path);
         }
 
+        public void ProcessAccept(Connection con)
+        {
+            con.SendOutboundMessage(FileTools.GetFileContents(DataPath, "login/logon.data",true));
+        }
 
         public void ProcessorAttach(Connection con)
         {
@@ -31,11 +39,6 @@ namespace Core
         public void ProcessInbound(string message, Connection con)
         {
 
-        }
-
-        public IMessageProcessor CreateMessageProcessor(Connection con)
-        {
-            return new LandingProcessor();
         }
     }
 

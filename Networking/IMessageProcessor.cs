@@ -16,9 +16,4 @@ namespace Networking
         void ProcessorAttach(Connection con);
         void ProcessorDetatch(Connection con);
     }
-
-    public interface IMessageProcessorFactory
-    {
-        IMessageProcessor CreateMessageProcessor(Connection con);
-    }
 }

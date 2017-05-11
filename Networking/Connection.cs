@@ -15,6 +15,8 @@ namespace Networking
         protected List<string> InboundMessages = new List<string>();
         protected List<string> OutboundMessages = new List<string>();
 
+        public int LanguageID = 0;
+
         public object ProtocolTag = null;
 
         protected readonly bool DebugEcho = true;

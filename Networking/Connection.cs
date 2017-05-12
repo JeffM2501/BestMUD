@@ -19,7 +19,7 @@ namespace Networking
 
         public object ProtocolTag = null;
 
-        protected readonly bool DebugEcho = true;
+        protected readonly bool DebugEcho = false;
 
         public object MessageProcessorTag { get; protected set; }
 

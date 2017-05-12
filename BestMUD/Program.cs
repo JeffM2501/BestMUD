@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Core;
 using Utilities;
+using Core.Authentication;
 
 namespace BestMUD
 {
@@ -15,6 +16,7 @@ namespace BestMUD
 
         static void Main(string[] args)
         {
+            // data path
             string dataPath = FindDataDir();
             if (dataPath == string.Empty)
                 return;
@@ -24,17 +26,24 @@ namespace BestMUD
             if (!Directory.Exists(basicLogPath))
                 Directory.CreateDirectory(basicLogPath);
 
+            // logs
             basicLogPath = Path.Combine(basicLogPath, "log.txt");
             LogCache.Setup(LogCache.BasicLog, basicLogPath, "BestMudLog");
             LogCache.MutliplexLog(LogCache.BasicLog, LogCache.NetworkLog);
 
+            //databases
 
+            AuthenticaitonDB.Setup(Path.Combine(dataPath, "databases/authentication.db3"));
+
+            // connetions
             ListeningManager.AddConnectionManager(new ConnectionManager(new Telnet.ProtocolProcessor(), GetMessageProcessor, 10));
             ListeningManager.AddPort(2525);
 
             while (true)
+            {
+                Lander.ProcessAllConnections();
                 System.Threading.Thread.Sleep(10);
-
+            }
             ListeningManager.StopAll();
         }
 

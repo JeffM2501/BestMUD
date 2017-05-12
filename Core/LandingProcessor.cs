@@ -6,6 +6,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
+using Core.Authentication;
+
 namespace Core
 {
     public class LandingProcessor : IMessageProcessor
@@ -43,7 +45,7 @@ namespace Core
         public LandingProcessor()
         {
             Handlers.Add(LandingStateData.LoginStates.Unknown, HandleUnknown);
-            Handlers.Add(LandingStateData.LoginStates.GotName, HandleGotName);
+            Handlers.Add(LandingStateData.LoginStates.GotName, HandleGotUsername);
         }
 
         public void SetDataPath(string path)
@@ -156,13 +158,30 @@ namespace Core
                 {
                     SendUserFileMessage(user, "login/invalid_password.data");
                     return true;
-                }  
+                } 
             }
 
             data.Password = message;
+            if (data.NeedUserCreate)
+            {
+                if (!AuthenticaitonDB.CreateUser(data.UserName, data.Password, string.Empty))
+                {
+                    SendUserFileMessage(user, "login/create_error.data");
+                    data.LoginState = LandingStateData.LoginStates.Unknown;
+                    return true;
+                }
+            }
             data.LoginState = LandingStateData.LoginStates.GotPassword;
 
             // process the new user or the login
+            string authFlags = string.Empty;
+
+            if (!AuthenticaitonDB.AuthenticateUser(data.UserName,data.Password,out authFlags))
+            {
+                SendUserFileMessage(user, "login/login_error.data");
+                data.LoginState = LandingStateData.LoginStates.Unknown;
+                return true;
+            }
 
             data.LoginState = LandingStateData.LoginStates.Authenticated;
 

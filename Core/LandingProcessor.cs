@@ -55,7 +55,6 @@ namespace Core
 
         public void ProcessAccept(Connection con)
         {
-            SendUserFileMessage(con, "login/logon.data");
         }
 
         public void ProcessorAttach(Connection con)
@@ -66,6 +65,12 @@ namespace Core
             lock(con)
                 con.SetMessageProcessorTag(ConnectionTagName, new LandingStateData());
 
+            if (con.SentHeader)
+            {
+                SendUserFileMessage(con, "login/logon.data");
+                con.SentHeader = true;
+            }
+           
             // send them the hello
             SendUserFileMessage(con, "login/get_name.data");
         }
@@ -132,6 +137,17 @@ namespace Core
                 else
                 {
                     // check if name exists?
+                    if (AuthenticaitonDB.UserExists(name))
+                    {
+                        SendUserFileMessage(user, "login/invalid_name.data");
+                        SendUserFileMessage(user, "login/create_name.data");
+                    }
+                    else
+                    {
+                        data.UserName = name;
+                        SendUserFileMessage(user, "login/create_password.data");
+                        data.LoginState = LandingStateData.LoginStates.GotName;
+                    }
                 }
             }
             else

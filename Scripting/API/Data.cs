@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Scripting
+namespace Scripting.API
 {
-    public static class API
+    public static class Data
     {
         private static Dictionary<string, object> GlobalDataCache = new Dictionary<string, object>();
 

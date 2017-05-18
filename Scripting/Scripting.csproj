@@ -70,7 +70,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API.cs" />
+    <Compile Include="API\Data.cs" />
+    <Compile Include="API\Events\Login.cs" />
+    <Compile Include="PlugIns.cs" />
+    <Compile Include="Register.cs" />
     <Compile Include="ScriptContents.cs" />
     <Compile Include="ScriptManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

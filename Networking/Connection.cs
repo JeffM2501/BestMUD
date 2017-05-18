@@ -21,6 +21,9 @@ namespace Networking
 
         public bool SentHeader = true;
 
+        public int UserID = -1;
+        public List<string> AccessFlags = new List<string>();
+
         protected readonly bool DebugEcho = false;
 
         public object MessageProcessorTag { get; protected set; }

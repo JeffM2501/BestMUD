@@ -1,10 +1,12 @@
-﻿using Networking;
+﻿using Core.Data;
+using Networking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Utilities;
 
 namespace Core
 {
@@ -17,6 +19,26 @@ namespace Core
         protected bool DestoryOnEmpty = true;
 
         public event EventHandler ProcessSetup = null;
+
+        protected T GetConStateData<T>(Connection con) where T:class
+        {
+            T d = con.GetMesssageProcessorTag<T>();
+            if (d == null)
+            {
+                string name = typeof(T).Name;
+
+                d = con.GetMesssageProcessorTag(name) as T;
+                if (d == null)
+                {
+                    d = Activator.CreateInstance<T>();
+                    con.SetMessageProcessorTag(name, d);
+                }
+                else
+                    con.SetMessageProcessorTag(name);
+            }
+
+            return d;
+        }
 
         public virtual void Setup()
         {
@@ -92,6 +114,11 @@ namespace Core
         protected virtual void ProcessConnection(Connection con)
         {
 
+        }
+
+        protected virtual void SendUserFileMessage(Connection user, string path)
+        {
+            user.SendOutboundMessage(FileTools.GetFileContents(Paths.DataPath, path, true));
         }
     }
 

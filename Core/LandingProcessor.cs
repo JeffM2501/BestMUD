@@ -13,8 +13,6 @@ namespace Core
 {
     public class LandingProcessor : PooledProcessor
     {
-        protected static readonly string ConnectionTagName = "LandingPage";
-
         public class LandingStateData
         {
             public enum LoginStates
@@ -50,8 +48,10 @@ namespace Core
 
         public override void ProcessorAttach(Connection con)
         {
-            lock (con)
-                con.SetMessageProcessorTag(ConnectionTagName, new LandingStateData());
+            GetConStateData<LandingStateData>(con);
+
+            con.UserID = -1;
+            con.AccessFlags.Clear();
 
             if (con.SentHeader)
             {
@@ -70,7 +70,7 @@ namespace Core
             if (!user.HasPendingInbound())
                 return;
 
-            LandingStateData data = GetConStateData(user);
+            LandingStateData data = GetConStateData<LandingStateData>(user);
 
             string msg = user.PopInboundMessage();
             while (msg != string.Empty)
@@ -94,7 +94,7 @@ namespace Core
 
         protected bool HandleUnknown(Connection user, string message)
         {
-            LandingStateData data = GetConStateData(user);
+            LandingStateData data = GetConStateData<LandingStateData>(user);
 
             string name = message.ToLowerInvariant();
 
@@ -134,7 +134,7 @@ namespace Core
 
         protected bool HandleGotUsername(Connection user, string message)
         {
-            LandingStateData data = GetConStateData(user);
+            LandingStateData data = GetConStateData<LandingStateData>(user);
 
             if (data.NeedUserCreate)
             {
@@ -159,8 +159,9 @@ namespace Core
 
             // process the new user or the login
             string authFlags = string.Empty;
+            int userID = -1;
 
-            if (!AuthenticaitonDB.AuthenticateUser(data.UserName,data.Password,out authFlags))
+            if (!AuthenticaitonDB.AuthenticateUser(data.UserName,data.Password,out authFlags, out userID))
             {
                 SendUserFileMessage(user, "login/login_error.data");
                 data.LoginState = LandingStateData.LoginStates.Unknown;
@@ -168,6 +169,10 @@ namespace Core
             }
 
             data.LoginState = LandingStateData.LoginStates.Authenticated;
+            user.UserID = userID;
+
+            if (authFlags != string.Empty)
+                user.AccessFlags.AddRange(authFlags.Split(";".ToCharArray()));
 
             // send them to the next handler
             AuthenticationComplete?.Invoke(this, user);
@@ -176,7 +181,7 @@ namespace Core
 
         protected void GotConUsername(Connection user, string username)
         {
-            LandingStateData data = GetConStateData(user);
+            LandingStateData data = GetConStateData<LandingStateData>(user);
             data.UserName = username;
             data.LoginState = LandingStateData.LoginStates.GotName;
 
@@ -184,11 +189,6 @@ namespace Core
                 SendUserFileMessage(user, "login/create_password.data");
             else
                 SendUserFileMessage(user,"login/login_password.data");
-        }
-
-        protected void SendUserFileMessage(Connection user, string path)
-        {
-            user.SendOutboundMessage(FileTools.GetFileContents(Paths.DataPath, path, true));
         }
 
         protected bool ValidUserName(string name)
@@ -199,24 +199,6 @@ namespace Core
         protected bool ValidPassword(string pass)
         {
             return pass.Trim().Length >= 3;
-        }
-
-        protected LandingStateData GetConStateData(Connection con)
-        {
-            LandingStateData d = con.GetMesssageProcessorTag<LandingStateData>();
-            if (d == null)
-            {
-                d = con.GetMesssageProcessorTag(ConnectionTagName) as LandingStateData;
-                if (d == null)
-                {
-                    d = new LandingStateData();
-                    con.SetMessageProcessorTag(ConnectionTagName, d);
-                }
-                else
-                    con.SetMessageProcessorTag(ConnectionTagName);
-            }
-
-            return d;
         }
     }
 

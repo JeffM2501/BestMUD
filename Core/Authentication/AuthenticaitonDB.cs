@@ -101,9 +101,10 @@ namespace Core.Authentication
             return UserExists(name);
         }
 
-        public static bool AuthenticateUser(string name, string password, out string accessFlags)
+        public static bool AuthenticateUser(string name, string password, out string accessFlags, out int userID)
         {
             accessFlags = string.Empty;
+            userID = -1;
 
             if (DB == null || !UserExists(name))
                 return false;
@@ -122,10 +123,11 @@ namespace Core.Authentication
                 LogCache.Log(LogCache.BasicLog, "Invalid authentication for " + name);
             else
             {
+                userID = results.GetInt32(0);
                 sql = "UPDATE users SET lastAuth=@now WHERE userID=@uid;";
                 command = new SQLiteCommand(sql, DB);
                 command.Parameters.Add(new SQLiteParameter("@now", DateTime.Now.ToString()));
-                command.Parameters.Add(new SQLiteParameter("@uid", results.GetInt32(0)));
+                command.Parameters.Add(new SQLiteParameter("@uid", userID));
                 command.ExecuteNonQuery();
             }
 

@@ -7,31 +7,38 @@ using System.Threading.Tasks;
 
 namespace Core.Characters
 {
-    public class CharacterSelectProcessor : IMessageProcessor
+    public class CharacterSelectProcessor : PooledProcessor
     {
-        public void ProcessAccept(Connection con)
+        public class CharacterSelectStateData
         {
-            throw new NotImplementedException();
+            public bool ForceCharacterCreate = false;
         }
 
-        public void ProcessDisconnect(Connection con)
+        public override void ProcessorAttach(Connection con)
         {
-            throw new NotImplementedException();
+            base.ProcessorAttach(con);
+
+            var data = GetConStateData<CharacterSelectStateData>(con);
+
+
+            data.ForceCharacterCreate = true;
+            // send out the need new 
+            SendUserFileMessage(con, "character/no_characters.data");
         }
 
-        public void ProcessInbound(string message, Connection con)
+        protected override void ProcessConnection(Connection con)
         {
-            throw new NotImplementedException();
-        }
+            base.ProcessConnection(con);
 
-        public void ProcessorAttach(Connection con)
-        {
-            throw new NotImplementedException();
-        }
+            var data = GetConStateData<CharacterSelectStateData>(con);
+            if (data.ForceCharacterCreate)
+            {
+                con.SetMessageProcessor(ProcessorPool.GetProcessor("CharacterCreate"));
+            }
+            else
+            {
 
-        public void ProcessorDetatch(Connection con)
-        {
-            throw new NotImplementedException();
+            }
         }
     }
 }

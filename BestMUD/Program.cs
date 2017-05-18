@@ -12,17 +12,16 @@ namespace BestMUD
 {
     public class Program
     {
-        public static LandingProcessor Lander = new LandingProcessor();
-
         static void Main(string[] args)
         {
-            // data path
+            // data paths
             string dataPath = FindDataDir();
             if (dataPath == string.Empty)
                 return;
 
-            Lander.SetDataPath(dataPath);
-            string basicLogPath = Path.Combine(Path.GetDirectoryName(dataPath),"logs");
+            Core.Data.Paths.DataPath = new DirectoryInfo(dataPath);
+
+            string basicLogPath = Path.Combine(Path.GetDirectoryName(dataPath), "logs");
             if (!Directory.Exists(basicLogPath))
                 Directory.CreateDirectory(basicLogPath);
 
@@ -35,21 +34,39 @@ namespace BestMUD
 
             AuthenticaitonDB.Setup(Path.Combine(dataPath, "databases/authentication.db3"));
 
-            // connetions
-            ListeningManager.AddConnectionManager(new ConnectionManager(new Telnet.ProtocolProcessor(), GetMessageProcessor, 10));
+        
+            // processor pools
+            ProcessorPool.SetupProcessorPool("Landing", typeof(LandingProcessor), 10, false, false, LandingSetup);
+
+            // connections
+            ListeningManager.AddConnectionManager(new ConnectionManager(new Telnet.ProtocolProcessor(), GetMessageProcessor, 200)); // todo, read config and get number of connection threads and connection counts
             ListeningManager.AddPort(2525);
 
             while (true)
             {
-                Lander.ProcessAllConnections();
+                ProcessorPool.UpdateProcessorsPools();
                 System.Threading.Thread.Sleep(10);
             }
             ListeningManager.StopAll();
         }
 
+        private static void LandingSetup(object sender, EventArgs args)
+        {
+            LandingProcessor lp = sender as LandingProcessor;
+            if (lp == null)
+                return;
+
+            lp.AuthenticationComplete += LandingProcessor_AuthenticationComplete;
+        }
+
+        private static void LandingProcessor_AuthenticationComplete(object sender, Connection e)
+        {
+            e.SetMessageProcessor(ProcessorPool.GetProcessor("CharacterSelect",e));
+        }
+
         public static IMessageProcessor GetMessageProcessor(Connection con)
         {
-            return Lander;
+            return ProcessorPool.GetProcessor("Landing",con);
         }
 
         public static string FindDataDir()

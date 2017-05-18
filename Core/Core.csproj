@@ -59,7 +59,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authentication\AuthenticaitonDB.cs" />
+    <Compile Include="Characters\CharacterSelectProcessor.cs" />
+    <Compile Include="Data\Paths.cs" />
     <Compile Include="LandingProcessor.cs" />
+    <Compile Include="PooledProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

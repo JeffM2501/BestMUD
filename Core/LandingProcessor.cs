@@ -7,13 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Core.Authentication;
+using Core.Data;
 
 namespace Core
 {
-    public class LandingProcessor : IMessageProcessor
+    public class LandingProcessor : PooledProcessor
     {
         protected static readonly string ConnectionTagName = "LandingPage";
-        protected DirectoryInfo DataPath = null;
 
         public class LandingStateData
         {
@@ -39,30 +39,18 @@ namespace Core
 
         public event EventHandler<Connection> AuthenticationComplete = null;
 
-
-        protected List<Connection> ActiveConnections = new List<Connection>();
-
         public LandingProcessor()
         {
             Handlers.Add(LandingStateData.LoginStates.Unknown, HandleUnknown);
             Handlers.Add(LandingStateData.LoginStates.GotName, HandleGotUsername);
+
+            MaxConnections = 200;
+            DestoryOnEmpty = true;
         }
 
-        public void SetDataPath(string path)
+        public override void ProcessorAttach(Connection con)
         {
-            DataPath = new DirectoryInfo(path);
-        }
-
-        public void ProcessAccept(Connection con)
-        {
-        }
-
-        public void ProcessorAttach(Connection con)
-        {
-            lock (ActiveConnections)
-                ActiveConnections.Add(con);
-
-            lock(con)
+            lock (con)
                 con.SetMessageProcessorTag(ConnectionTagName, new LandingStateData());
 
             if (con.SentHeader)
@@ -70,57 +58,37 @@ namespace Core
                 SendUserFileMessage(con, "login/logon.data");
                 con.SentHeader = true;
             }
-           
+
             // send them the hello
             SendUserFileMessage(con, "login/get_name.data");
         }
-        public void ProcessorDetatch(Connection con)
-        {
-            lock (ActiveConnections)
-                ActiveConnections.Remove(con);
-        }
 
-        public void ProcessDisconnect(Connection con)
+        protected override void ProcessConnection(Connection user)
         {
-            ProcessorDetatch(con);
-        }
+            base.ProcessConnection(user);
 
-        public void ProcessInbound(string message, Connection con)
-        {
-            // skip, we process in batches
-        }
+            if (!user.HasPendingInbound())
+                return;
 
-        public virtual void ProcessAllConnections()
-        {
-            Connection[] users = new Connection[0];
-            lock (ActiveConnections)
-                users = ActiveConnections.ToArray();
+            LandingStateData data = GetConStateData(user);
 
-            foreach (var user in users)
+            string msg = user.PopInboundMessage();
+            while (msg != string.Empty)
             {
-                if (!user.HasPendingInbound())
-                    continue;
-
-                LandingStateData data = GetConStateData(user);
-
-                string msg = user.PopInboundMessage();
-                while (msg != string.Empty)
+                bool keepGoing = false;
+                if (Handlers.ContainsKey(data.LoginState))
+                    keepGoing = Handlers[data.LoginState](user, msg);
+                else
                 {
-                    bool keepGoing = false;
-                    if (Handlers.ContainsKey(data.LoginState))
-                        keepGoing = Handlers[data.LoginState](user, msg);
-                    else
-                    {
-                        LogCache.Log(LogCache.BasicLog, "Unable to process handler for " + data.LoginState.ToString());
-                        data.LoginState = LandingStateData.LoginStates.Unknown;
-                        keepGoing = Handlers[data.LoginState](user, msg);
-                    }
-
-                    if (keepGoing)
-                        msg = user.PopInboundMessage();
-                    else
-                        msg = string.Empty;
+                    LogCache.Log(LogCache.BasicLog, "Unable to process handler for " + data.LoginState.ToString());
+                    data.LoginState = LandingStateData.LoginStates.Unknown;
+                    keepGoing = Handlers[data.LoginState](user, msg);
                 }
+
+                if (keepGoing)
+                    msg = user.PopInboundMessage();
+                else
+                    msg = string.Empty;
             }
         }
 
@@ -220,7 +188,7 @@ namespace Core
 
         protected void SendUserFileMessage(Connection user, string path)
         {
-            user.SendOutboundMessage(FileTools.GetFileContents(DataPath, path, true));
+            user.SendOutboundMessage(FileTools.GetFileContents(Paths.DataPath, path, true));
         }
 
         protected bool ValidUserName(string name)

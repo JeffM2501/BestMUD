@@ -94,8 +94,9 @@ namespace Networking
 
                 foreach(var con in connections)
                 {
-                    if (!con.Socket.Connected)
+                    if (!con.Socket.Connected || con.MessageProcessor == null) // it's dead or noody wants them
                     {
+                        con.Socket.Close();
                         ProtcolProcessor.RemoveConnection(con);
                         if (con.MessageProcessor != null)
                             con.MessageProcessor.ProcessDisconnect(con);
@@ -146,6 +147,9 @@ namespace Networking
                             if (con.HasOutboundData())
                                 oneHadPending = true;
                         }
+
+                        if (con.MessageProcessor == null) // they are not handing anyone so kill them. They will be cleaned up on the next pass
+                            con.Socket.Close();
                     }
                 }
 

@@ -58,11 +58,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Authentication\AuthenticaitonDB.cs" />
-    <Compile Include="Characters\CharacterSelectProcessor.cs" />
+    <Compile Include="Databases\Authentication\AuthenticaitonDB.cs" />
+    <Compile Include="Databases\PlayerData\PlayerCharacterDB.cs" />
+    <Compile Include="Databases\SQLiteDB.cs" />
+    <Compile Include="Game\Characters\PlayerCharacter.cs" />
+    <Compile Include="Processors\Characters\CharacterSelectProcessor.cs" />
     <Compile Include="Data\Paths.cs" />
-    <Compile Include="LandingProcessor.cs" />
-    <Compile Include="PooledProcessor.cs" />
+    <Compile Include="Processors\LandingProcessor.cs" />
+    <Compile Include="Processors\PooledProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

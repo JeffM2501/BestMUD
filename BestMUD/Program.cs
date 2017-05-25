@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Core;
+using Core.Data;
+using Core.Processors;
 using Utilities;
-using Core.Authentication;
+using Core.Databases.Authentication;
 
 namespace BestMUD
 {
@@ -32,7 +33,7 @@ namespace BestMUD
 
             //databases
 
-            AuthenticaitonDB.Setup(Path.Combine(dataPath, "databases/authentication.db3"));
+            AuthenticaitonDB.Instance.Setup(Path.Combine(dataPath, "databases/authentication.db3"));
 
         
             // processor pools

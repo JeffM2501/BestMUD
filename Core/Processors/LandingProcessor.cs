@@ -6,10 +6,10 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-using Core.Authentication;
+using Core.Databases.Authentication;
 using Core.Data;
 
-namespace Core
+namespace Core.Processors
 {
     public class LandingProcessor : PooledProcessor
     {
@@ -105,7 +105,7 @@ namespace Core
                 else
                 {
                     // check if name exists?
-                    if (AuthenticaitonDB.UserExists(name))
+                    if (AuthenticaitonDB.Instance.UserExists(name))
                     {
                         SendUserFileMessage(user, "login/invalid_name.data");
                         SendUserFileMessage(user, "login/create_name.data");
@@ -148,7 +148,7 @@ namespace Core
             data.Password = message;
             if (data.NeedUserCreate)
             {
-                if (!AuthenticaitonDB.CreateUser(data.UserName, data.Password, string.Empty))
+                if (!AuthenticaitonDB.Instance.CreateUser(data.UserName, data.Password, string.Empty))
                 {
                     SendUserFileMessage(user, "login/create_error.data");
                     data.LoginState = LandingStateData.LoginStates.Unknown;
@@ -161,7 +161,7 @@ namespace Core
             string authFlags = string.Empty;
             int userID = -1;
 
-            if (!AuthenticaitonDB.AuthenticateUser(data.UserName,data.Password,out authFlags, out userID))
+            if (!AuthenticaitonDB.Instance.AuthenticateUser(data.UserName,data.Password,out authFlags, out userID))
             {
                 SendUserFileMessage(user, "login/login_error.data");
                 data.LoginState = LandingStateData.LoginStates.Unknown;

@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Utilities;
 
-namespace Core
+namespace Core.Processors
 {
     public class PooledProcessor : IMessageProcessor
     {
@@ -182,7 +182,7 @@ namespace Core
 
     public static class ProcessorPool
     {
-        private static Dictionary<string, ProcessorPoolData> ProcessorPools = new Dictionary<string, Core.ProcessorPoolData>();
+        private static Dictionary<string, ProcessorPoolData> ProcessorPools = new Dictionary<string, Core.Processors.ProcessorPoolData>();
 
         private static List<ProcessorPoolData> NonThreadedPools = new List<ProcessorPoolData>();
         private static List<ThreadedPoolProcessor> ProcessingThreads = new List<ThreadedPoolProcessor>();

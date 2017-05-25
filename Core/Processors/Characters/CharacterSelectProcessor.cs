@@ -5,7 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Characters
+using Core.Processors;
+
+namespace Core.Processors.Characters
 {
     public class CharacterSelectProcessor : PooledProcessor
     {
@@ -33,7 +35,7 @@ namespace Core.Characters
             var data = GetConStateData<CharacterSelectStateData>(con);
             if (data.ForceCharacterCreate)
             {
-                con.SetMessageProcessor(ProcessorPool.GetProcessor("CharacterCreate"));
+                con.SetMessageProcessor(ProcessorPool.GetProcessor("CharacterCreate",con));
             }
             else
             {

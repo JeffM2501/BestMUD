@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
+
 using System.Data.SQLite;
 using Utilities;
 
-namespace Core.Authentication
+namespace Core.Databases.Authentication
 {
-    public static class AuthenticaitonDB
+    public class AuthenticaitonDB : SQLiteDB
     {
-        private static FileInfo AuthDBFile = null;
-
-        private static SQLiteConnection DB = null;
+        public static AuthenticaitonDB Instance = new AuthenticaitonDB();
 
         internal class UserInfo
         {
@@ -22,31 +17,9 @@ namespace Core.Authentication
             public string AccessFlags = string.Empty;
         }
 
-        public static void Setup(string path)
+        protected override void ValidateDatabase()
         {
-            AuthDBFile = new FileInfo(path);
-
-            if (!AuthDBFile.Exists)
-            {
-                SQLiteConnection.CreateFile(AuthDBFile.FullName);
-                if (!File.Exists(AuthDBFile.FullName))
-                    return;
-            }
-
-            if (DB != null)
-                DB.Close();
-
-            DB = new SQLiteConnection("Data Source=" + AuthDBFile.FullName);
-            if (DB != null)
-                DB.Open();
-
-            ValidateDatabase();
-        }
-
-        private static void ValidateDatabase()
-        {
-            if (DB == null)
-                return;
+            base.ValidateDatabase();
 
             string sql = "SELECT name FROM "+ DB.Database+".sqlite_master  WHERE type='table' AND name='users';";
             SQLiteCommand command = new SQLiteCommand(sql, DB);
@@ -63,7 +36,7 @@ namespace Core.Authentication
             }
         }
 
-        public static bool UserExists(string name)
+        public bool UserExists(string name)
         {
             if (DB == null)
                 return false;
@@ -82,7 +55,7 @@ namespace Core.Authentication
             return true;
         }
 
-        public static bool CreateUser(string name, string password, string accessFlags)
+        public bool CreateUser(string name, string password, string accessFlags)
         {
             if (UserExists(name))
                 return false;
@@ -101,7 +74,7 @@ namespace Core.Authentication
             return UserExists(name);
         }
 
-        public static bool AuthenticateUser(string name, string password, out string accessFlags, out int userID)
+        public bool AuthenticateUser(string name, string password, out string accessFlags, out int userID)
         {
             accessFlags = string.Empty;
             userID = -1;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Game.Characters
+namespace Core.Data.Game.Characters
 {
     public class PlayerCharacter
     {
@@ -41,6 +41,6 @@ namespace Core.Game.Characters
         public List<string> Equipment = new List<string>();
         public List<string> Inventory = new List<string>();
 
-        public Dictionary<Tuple<int,string>, string> QuestData = new Dictionary<Tuple<int, string>, string>();
+        public Dictionary<Tuple<int, string>, string> QuestData = new Dictionary<Tuple<int, string>, string>();
     }
 }

@@ -4,7 +4,7 @@ using System.Text;
 using System.Data.SQLite;
 
 using Utilities;
-using Core.Game.Characters;
+using Core.Data.Game.Characters;
 
 namespace Core.Databases.PlayerData
 {

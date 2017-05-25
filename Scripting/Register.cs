@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Scripting.API.Handlers;
+
 namespace Scripting
 {
     public static class Register
@@ -21,6 +23,13 @@ namespace Scripting
                 RegisteredFunctionNames[handler.ToLower()] = name;
             else
                 RegisteredFunctionNames.Add(handler.ToLower(), name);
+        }
+
+        internal static ICharacterCreator CharacterHandler = null;
+
+        public static void SetCharacterCreator(ICharacterCreator handler)
+        {
+            CharacterHandler = handler;
         }
     }
 }

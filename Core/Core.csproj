@@ -61,7 +61,6 @@
     <Compile Include="Databases\Authentication\AuthenticaitonDB.cs" />
     <Compile Include="Databases\PlayerData\PlayerCharacterDB.cs" />
     <Compile Include="Databases\SQLiteDB.cs" />
-    <Compile Include="Game\Characters\PlayerCharacter.cs" />
     <Compile Include="Processors\Characters\CharacterSelectProcessor.cs" />
     <Compile Include="Data\Paths.cs" />
     <Compile Include="Processors\LandingProcessor.cs" />
@@ -69,6 +68,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.Data\Core.Data.csproj">
+      <Project>{875bdd2a-ce63-4f54-9957-08bc0a421c41}</Project>
+      <Name>Core.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Networking\Networking.csproj">
       <Project>{1d77c062-a8ba-47e7-81da-c5af01080fb0}</Project>
       <Name>Networking</Name>

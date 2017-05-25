@@ -10,6 +10,9 @@ namespace Core.Databases.PlayerData
 {
     public class PlayerCharacterDB : SQLiteDB
     {
+        protected List<PlayerCharacter> ActiveCharacters = new List<PlayerCharacter>();
+
+
         protected override void ValidateDatabase()
         {
             base.ValidateDatabase();
@@ -104,16 +107,51 @@ namespace Core.Databases.PlayerData
                 if (results.HasRows)
                 {
                     results.Read();
-                    return ReadPCData(results, true);
+                    var pc = ReadPCData(results, true);
+                    lock (ActiveCharacters)
+                        ActiveCharacters.Add(pc);
+                    return pc;
                 }
             }
 
             return null;
         }
 
+        public void CheckInCharacter(PlayerCharacter pc)
+        {
+            lock (ActiveCharacters)
+                ActiveCharacters.Remove(pc);
+
+            if (pc.Dirty)
+                SavePlayerCharacter(pc);
+        }
+
         public void SavePlayerCharacter(PlayerCharacter pc)
         {
+            lock(pc)
+            {
+                if (pc.ReadOnly)
+                    return;
 
+                string sql = "UPDATE characters  Set name=@name, raceID=@raceID, level=@level, experience=@exp, classID=@classID, attributeData=@att, equipmentData=@equip, inventoryData=@inv WHERE characterID=@cid AND userID=@uid AND enabled=1);";
+                SQLiteCommand command = new SQLiteCommand(sql, DB);
+
+                command.Parameters.Add(new SQLiteParameter("@name", pc.Name));
+                command.Parameters.Add(new SQLiteParameter("@faceID", pc.RaceID));
+                command.Parameters.Add(new SQLiteParameter("@classID", pc.ClassID));
+                command.Parameters.Add(new SQLiteParameter("@level", pc.Level));
+                command.Parameters.Add(new SQLiteParameter("@exp", pc.Experience));
+
+                command.Parameters.Add(new SQLiteParameter("@att", string.Join(";",pc.Attributes.ToArray())));
+                command.Parameters.Add(new SQLiteParameter("@equip", string.Join(";", pc.Equipment.ToArray())));
+                command.Parameters.Add(new SQLiteParameter("@inv", string.Join(";", pc.Inventory.ToArray())));
+
+                command.Parameters.Add(new SQLiteParameter("@uid", pc.UserID));
+                command.Parameters.Add(new SQLiteParameter("@cid", pc.UID));
+                command.ExecuteNonQuery();
+
+                pc.Dirty = false;
+            }
         }
 
         public bool PCNameExists(string name)
@@ -159,22 +197,28 @@ namespace Core.Databases.PlayerData
             if (PCNameExists(pc.Name))
                 return null;
 
-            string sql = "INSERT INTO characters (userID, enabled, name) VALUES(@uid,1, @name);";
-            SQLiteCommand command = new SQLiteCommand(sql, DB);
-            command.Parameters.Add(new SQLiteParameter("@uid", pc.UserID));
-            command.Parameters.Add(new SQLiteParameter("@name", pc.Name));
-            command.ExecuteNonQuery();
+            lock(pc)
+            {
+                string sql = "INSERT INTO characters (userID, enabled, name) VALUES(@uid,1, @name);";
+                SQLiteCommand command = new SQLiteCommand(sql, DB);
+                command.Parameters.Add(new SQLiteParameter("@uid", pc.UserID));
+                command.Parameters.Add(new SQLiteParameter("@name", pc.Name));
+                command.ExecuteNonQuery();
 
-            sql = "SELECT characterID FROM characters WHERE name=@name AND userID=@uid AND enabled=1;";
-            command = new SQLiteCommand(sql, DB);
-            command.Parameters.Add(new SQLiteParameter("@name", pc.Name));
-            command.Parameters.Add(new SQLiteParameter("@uid", pc.UserID));
+                sql = "SELECT characterID FROM characters WHERE name=@name AND userID=@uid AND enabled=1;";
+                command = new SQLiteCommand(sql, DB);
+                command.Parameters.Add(new SQLiteParameter("@name", pc.Name));
+                command.Parameters.Add(new SQLiteParameter("@uid", pc.UserID));
 
-            var results = command.ExecuteReader();
-            if (!results.HasRows)
-                return null;
-            results.Read(); ;
-            pc.UID = results.GetInt32();
+                var results = command.ExecuteReader();
+                if (!results.HasRows)
+                    return null;
+                results.Read(); ;
+                pc.FinalizeCreate(results.GetInt32(0));
+                SavePlayerCharacter(pc);
+
+                return pc;
+            }
         }
     }
 }

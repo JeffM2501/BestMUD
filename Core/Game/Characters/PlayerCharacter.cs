@@ -10,9 +10,20 @@ namespace Core.Game.Characters
     {
         public bool ReadOnly { get; protected set; }
 
+        protected object DirtyLocker = new object();
+        protected bool InternalDirty = false;
+
+        public bool Dirty { get { lock (DirtyLocker) return InternalDirty && !ReadOnly; } set { lock (DirtyLocker) InternalDirty = value; } }
+
         public PlayerCharacter(bool readOnly)
         {
             ReadOnly = readOnly;
+        }
+
+        public void FinalizeCreate(int uid)
+        {
+            UID = uid;
+            ReadOnly = false;
         }
 
         public int UID = int.MinValue;

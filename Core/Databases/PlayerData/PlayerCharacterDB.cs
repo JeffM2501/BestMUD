@@ -10,8 +10,9 @@ namespace Core.Databases.PlayerData
 {
     public class PlayerCharacterDB : SQLiteDB
     {
-        protected List<PlayerCharacter> ActiveCharacters = new List<PlayerCharacter>();
+        public static PlayerCharacterDB Instance = new PlayerCharacterDB();
 
+        protected List<PlayerCharacter> ActiveCharacters = new List<PlayerCharacter>();
 
         protected override void ValidateDatabase()
         {

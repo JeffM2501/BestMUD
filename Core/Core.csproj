@@ -59,8 +59,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Databases\Authentication\AuthenticaitonDB.cs" />
+    <Compile Include="Databases\GameData\ClassDB.cs" />
+    <Compile Include="Databases\GameData\RaceDB.cs" />
     <Compile Include="Databases\PlayerData\PlayerCharacterDB.cs" />
     <Compile Include="Databases\SQLiteDB.cs" />
+    <Compile Include="Processors\Characters\CharacterCreateProcessor.cs" />
     <Compile Include="Processors\Characters\CharacterSelectProcessor.cs" />
     <Compile Include="Data\Paths.cs" />
     <Compile Include="Processors\LandingProcessor.cs" />

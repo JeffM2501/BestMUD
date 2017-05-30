@@ -63,36 +63,21 @@ namespace Core.Processors
             SendUserFileMessage(con, "login/get_name.data");
         }
 
-        protected override void ProcessConnection(Connection user)
+        protected override bool ProcessUserMessage(Connection user, string msg)
         {
-            base.ProcessConnection(user);
-
-            if (!user.HasPendingInbound())
-                return;
-
             LandingStateData data = GetConStateData<LandingStateData>(user);
 
-            string msg = user.PopInboundMessage();
-            while (msg != string.Empty)
+            if (Handlers.ContainsKey(data.LoginState))
+                return Handlers[data.LoginState](user, msg);
+            else
             {
-                bool keepGoing = false;
-                if (Handlers.ContainsKey(data.LoginState))
-                    keepGoing = Handlers[data.LoginState](user, msg);
-                else
-                {
-                    LogCache.Log(LogCache.BasicLog, "Unable to process handler for " + data.LoginState.ToString());
-                    data.LoginState = LandingStateData.LoginStates.Unknown;
-                    keepGoing = Handlers[data.LoginState](user, msg);
-                }
-
-                if (keepGoing)
-                    msg = user.PopInboundMessage();
-                else
-                    msg = string.Empty;
+                LogCache.Log(LogCache.BasicLog, "Unable to process landing handler for " + data.LoginState.ToString());
+                data.LoginState = LandingStateData.LoginStates.Unknown;
+                return Handlers[data.LoginState](user, msg);
             }
         }
 
-        protected bool HandleUnknown(Connection user, string message)
+    protected bool HandleUnknown(Connection user, string message)
         {
             LandingStateData data = GetConStateData<LandingStateData>(user);
 

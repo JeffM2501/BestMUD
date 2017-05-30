@@ -13,13 +13,13 @@ namespace Utilities
         public static string GetFileContents(DirectoryInfo root, string path, bool useCache)
         {
             if (root == null)
-                return string.Empty;
+                return null;
 
             FileInfo file = new FileInfo(Path.Combine(root.FullName, path));
             if (!file.Exists)
             {
                 LogCache.Log(LogCache.BasicLog, "Requested File not found: " + path);
-                return string.Empty;
+                return null;
             }
 
             if (useCache && StaticFileCache.ContainsKey(file.FullName))

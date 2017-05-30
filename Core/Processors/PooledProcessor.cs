@@ -111,14 +111,32 @@ namespace Core.Processors
             return false;
         }
 
-        protected virtual void ProcessConnection(Connection con)
-        {
+        protected virtual void ProcessConnection(Connection user)
+        { 
+            if (!user.HasPendingInbound())
+                return;
 
+            string msg = user.PopInboundMessage();
+            while (msg != string.Empty)
+            {
+                if (ProcessUserMessage(user, msg))
+                    msg = user.PopInboundMessage();
+                else
+                    msg = string.Empty;
+            }
+        }
+
+        protected virtual bool ProcessUserMessage(Connection user, string msg)
+        {
+            return false;
         }
 
         protected virtual void SendUserFileMessage(Connection user, string path)
         {
-            user.SendOutboundMessage(FileTools.GetFileContents(Paths.DataPath, path, true));
+            string data = FileTools.GetFileContents(Paths.DataPath, path, true);
+            if (data == null)
+                data = path;
+            user.SendOutboundMessage(data);
         }
     }
 

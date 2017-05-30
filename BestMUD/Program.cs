@@ -8,11 +8,22 @@ using Core.Data;
 using Core.Processors;
 using Utilities;
 using Core.Databases.Authentication;
+using Core.Databases.PlayerData;
+using Core.Databases.GameData;
 
 namespace BestMUD
 {
     public class Program
     {
+        private static bool Exit = false;
+
+        private static object ExitLocker = new object();
+        public static void Quit()
+        {
+            lock (ExitLocker)
+                Exit = true;
+        }
+
         static void Main(string[] args)
         {
             // data paths
@@ -34,8 +45,10 @@ namespace BestMUD
             //databases
 
             AuthenticaitonDB.Instance.Setup(Path.Combine(dataPath, "databases/authentication.db3"));
+            PlayerCharacterDB.Instance.Setup(Path.Combine(dataPath, "databases/player_characters.db3"));
+            ClassDB.Instance.Setup(Path.Combine(dataPath, "databases/default_race_class.db3"));
+            RaceDB.Instance.Setup(Path.Combine(dataPath, "databases/default_race_class.db3"));
 
-        
             // processor pools
             ProcessorPool.SetupProcessorPool("Landing", typeof(LandingProcessor), 10, false, false, LandingSetup);
 
@@ -47,6 +60,12 @@ namespace BestMUD
             {
                 ProcessorPool.UpdateProcessorsPools();
                 System.Threading.Thread.Sleep(10);
+
+                lock (ExitLocker)
+                {
+                    if (Exit)
+                        break;
+                }
             }
             ListeningManager.StopAll();
         }

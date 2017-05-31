@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Data.Common;
 using Core.Data.Game.Classes;
 
 namespace Core.Databases.GameData
@@ -54,7 +55,7 @@ namespace Core.Databases.GameData
                 }
                 catch (Exception /*ex*/) { }
 
-                c.DefaultAttributeBonuses.AddRange(results.GetString(4).Split(";".ToCharArray()));
+                c.DefaultAttributeBonuses = AttributeList.DeserlizeFromString(results.GetString(4));
                 c.DefaultInventory.AddRange(results.GetString(5).Split(";".ToCharArray()));
                 c.DefaultFeatures.AddRange(results.GetString(6).Split(";".ToCharArray()));
             }
@@ -83,7 +84,7 @@ namespace Core.Databases.GameData
             }
         }
 
-        protected ClassInfo FindClass(int id)
+        public ClassInfo FindClass(int id)
         {
             lock (ClassCache)
             {
@@ -93,10 +94,24 @@ namespace Core.Databases.GameData
             return null;
         }
 
-        protected ClassInfo[] GetClassList()
+        public  ClassInfo[] GetClassList()
         {
             lock (ClassCache)
                 return ClassCache.Values.ToArray();
+        }
+
+        public int[] GetClassIndexList()
+        {
+            List<int> i = new List<int>();
+            lock (ClassCache)
+            {
+                foreach (var r in ClassCache)
+                {
+                    i.Add(r.Key);
+                }
+            }
+
+            return i.ToArray();
         }
     }
 }

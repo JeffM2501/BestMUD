@@ -4,7 +4,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Core.Data.Common;
 using Core.Data.Game.Races;
 
 namespace Core.Databases.GameData
@@ -40,7 +40,7 @@ namespace Core.Databases.GameData
             {
                 race.RaceID = results.GetInt32(0);
                 race.Name = results.GetString(1);
-                race.DefaultAttributeBonuses.AddRange(results.GetString(2).Split(";".ToCharArray()));
+                race.DefaultAttributeBonuses = AttributeList.DeserlizeFromString(results.GetString(2));
                 race.DefaultInventory.AddRange(results.GetString(3).Split(";".ToCharArray()));
                 race.DefaultFeatures.AddRange(results.GetString(4).Split(";".ToCharArray()));
             }

@@ -63,6 +63,8 @@
     <Compile Include="Databases\GameData\RaceDB.cs" />
     <Compile Include="Databases\PlayerData\PlayerCharacterDB.cs" />
     <Compile Include="Databases\SQLiteDB.cs" />
+    <Compile Include="DefaultRules\DefaultCharacterCreator.cs" />
+    <Compile Include="DefaultRules\DefaultRuleset.cs" />
     <Compile Include="Processors\Characters\CharacterCreateProcessor.cs" />
     <Compile Include="Processors\Characters\CharacterSelectProcessor.cs" />
     <Compile Include="Data\Paths.cs" />
@@ -78,6 +80,10 @@
     <ProjectReference Include="..\Networking\Networking.csproj">
       <Project>{1d77c062-a8ba-47e7-81da-c5af01080fb0}</Project>
       <Name>Networking</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Scripting\Scripting.csproj">
+      <Project>{4d320710-217e-4f2f-9d57-c054ea7ab2d9}</Project>
+      <Name>Scripting</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utilities\Utilities.csproj">
       <Project>{2d9488b6-935d-4e72-989c-898968fbc927}</Project>

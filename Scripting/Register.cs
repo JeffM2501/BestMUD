@@ -25,7 +25,7 @@ namespace Scripting
                 RegisteredFunctionNames.Add(handler.ToLower(), name);
         }
 
-        internal static ICharacterCreator CharacterHandler = null;
+        public static ICharacterCreator CharacterHandler { get; private set; } = null;
 
         public static void SetCharacterCreator(ICharacterCreator handler)
         {

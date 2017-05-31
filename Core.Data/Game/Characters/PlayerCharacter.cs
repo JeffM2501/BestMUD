@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Data.Common;
 
 namespace Core.Data.Game.Characters
 {
@@ -37,7 +38,7 @@ namespace Core.Data.Game.Characters
         public int RaceID = int.MinValue;
         public int ClassID = int.MinValue;
 
-        public List<string> Attributes = new List<string>();
+        public AttributeList Attributes = new AttributeList();
         public List<string> Equipment = new List<string>();
         public List<string> Inventory = new List<string>();
 

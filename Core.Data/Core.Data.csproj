@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\AttributeList.cs" />
     <Compile Include="Game\Characters\PlayerCharacter.cs" />
     <Compile Include="Game\Classes\ClassInfo.cs" />
     <Compile Include="Game\Races\RaceInfo.cs" />

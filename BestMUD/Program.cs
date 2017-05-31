@@ -49,6 +49,9 @@ namespace BestMUD
             ClassDB.Instance.Setup(Path.Combine(dataPath, "databases/default_race_class.db3"));
             RaceDB.Instance.Setup(Path.Combine(dataPath, "databases/default_race_class.db3"));
 
+            // defualt rules
+            Core.DefaultRules.DefaultRuleset.Init();
+
             // processor pools
             ProcessorPool.SetupProcessorPool("Landing", typeof(LandingProcessor), 10, false, false, LandingSetup);
 

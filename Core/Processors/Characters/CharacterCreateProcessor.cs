@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 using Core.Processors;
 using Core.Databases.GameData;
+using Core.Databases.PlayerData;
+using Core.Data.Game.Characters;
 
 namespace Core.Processors.Characters
 {
@@ -19,6 +21,7 @@ namespace Core.Processors.Characters
             public int ClassChoice = -1;
 
             public int[] RaceIndexes = null;
+            public int[] ClassIndexes = null;
         }
 
         public override void ProcessorAttach(Connection con)
@@ -36,18 +39,29 @@ namespace Core.Processors.Characters
             SendUserFileMessage(user, "character/race_list_start.data");
 
             var races = RaceDB.Instance.GetRaceList();
+            races = Scripting.Register.CharacterHandler?.FilterRaces(user, races);
+
             for (int i = 1; i <= races.Length; i++)
                 user.SendOutboundMessage(string.Format("{0}. {1}", i, races[i].Name));
             SendUserFileMessage(user, "character/race_list_end.data");
         }
 
-        protected void ShowClassList(Connection user)
+        protected void ShowClassList(Connection user, CharacterCreateStateData data)
         {
             SendUserFileMessage(user, "character/class_list_start.data");
 
-            var races = RaceDB.Instance.GetRaceList();
-            for (int i = 1; i <= races.Length; i++)
-                user.SendOutboundMessage(string.Format("{0}. {1}", i, races[i].Name));
+            var classes = ClassDB.Instance.GetClassList();
+            classes = Scripting.Register.CharacterHandler?.FilterClasses(user, RaceDB.Instance.FindRace(data.RaceChoice), classes);
+
+            List<int> classIndexes = new List<int>();
+
+            for (int i = 1; i <= classes.Length; i++)
+            {
+                user.SendOutboundMessage(string.Format("{0}. {1}", i, classes[i].Name));
+                classIndexes.Add(classes[i].ClassID);
+            }
+            data.ClassIndexes = classIndexes.ToArray();
+               
             SendUserFileMessage(user, "character/class_list_end.data");
         }
 
@@ -59,9 +73,16 @@ namespace Core.Processors.Characters
 
             if (data.Name == string.Empty)
             {
-                data.Name = msg;
-                data.RaceIndexes = RaceDB.Instance.GetRaceIndexList();
-                ShowRaceList(user);
+                if (PlayerCharacterDB.Instance.PCNameExists(msg))
+                {
+                    SendUserFileMessage(user, "character/name_invalid_entry.data");
+                }
+                else
+                {
+                    data.Name = msg;
+                    data.RaceIndexes = RaceDB.Instance.GetRaceIndexList();
+                    ShowRaceList(user);
+                }
             }
             else if (data.RaceChoice == -1)
             {
@@ -73,13 +94,31 @@ namespace Core.Processors.Characters
                 }
                 else
                 {
-                    data.RaceChoice = data.RaceIndexes[index];
+                    data.RaceChoice = data.RaceIndexes[index-1];
                     SendUserFileMessage(user, "character/character_name.data");
+                    ShowClassList(user,data);
                 }
             }
             else if (data.ClassChoice == -1)
             {
+                int index = -1;
+                if (!int.TryParse(msg, out index) || index < 1 || index > data.RaceIndexes.Length)
+                {
+                    SendUserFileMessage(user, "character/class_list_invalid_entry.data");
+                    ShowClassList(user, data);
+                }
+                else
+                {
+                    data.ClassChoice = data.ClassIndexes[index - 1];
 
+                    // create the character
+                    PlayerCharacter pc = new PlayerCharacter(true);
+                    pc = Scripting.Register.CharacterHandler?.CreateCharacter(user, RaceDB.Instance.FindRace(data.RaceChoice), ClassDB.Instance.FindClass(data.ClassChoice));
+                    if (pc != null)
+                    {
+                        pc = PlayerCharacterDB.Instance.CreatePlayerCharacter(pc);
+                    }
+                }
             }
             else
             {

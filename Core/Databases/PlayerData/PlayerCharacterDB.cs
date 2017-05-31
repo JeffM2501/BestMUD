@@ -5,6 +5,7 @@ using System.Data.SQLite;
 
 using Utilities;
 using Core.Data.Game.Characters;
+using Core.Data.Common;
 
 namespace Core.Databases.PlayerData
 {
@@ -73,7 +74,8 @@ namespace Core.Databases.PlayerData
                 pc.Level = results.GetInt32(5);
                 pc.Experience = results.GetInt32(6);
                 pc.ClassID = results.GetInt32(7);
-                pc.Attributes.AddRange(results.GetString(8).Split(";".ToCharArray()));
+
+                pc.Attributes = AttributeList.DeserlizeFromString(results.GetString(8));
                 pc.Equipment.AddRange(results.GetString(9).Split(";".ToCharArray()));
                 pc.Inventory.AddRange(results.GetString(10).Split(";".ToCharArray()));
 
@@ -143,7 +145,7 @@ namespace Core.Databases.PlayerData
                 command.Parameters.Add(new SQLiteParameter("@level", pc.Level));
                 command.Parameters.Add(new SQLiteParameter("@exp", pc.Experience));
 
-                command.Parameters.Add(new SQLiteParameter("@att", string.Join(";",pc.Attributes.ToArray())));
+                command.Parameters.Add(new SQLiteParameter("@att", pc.Attributes.SerializeToText());
                 command.Parameters.Add(new SQLiteParameter("@equip", string.Join(";", pc.Equipment.ToArray())));
                 command.Parameters.Add(new SQLiteParameter("@inv", string.Join(";", pc.Inventory.ToArray())));
 

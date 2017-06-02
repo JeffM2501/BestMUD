@@ -48,6 +48,8 @@ namespace Core.Processors
 
         public override void ProcessorAttach(Connection con)
         {
+            base.ProcessorAttach(con);
+
             GetConStateData<LandingStateData>(con);
 
             con.UserID = -1;
@@ -77,7 +79,7 @@ namespace Core.Processors
             }
         }
 
-    protected bool HandleUnknown(Connection user, string message)
+        protected bool HandleUnknown(Connection user, string message)
         {
             LandingStateData data = GetConStateData<LandingStateData>(user);
 
@@ -85,6 +87,12 @@ namespace Core.Processors
 
             if (data.NeedUserCreate)
             {
+                if (name == "exit")
+                {
+                    SendUserFileMessage(user, "login/get_name.data");
+                    return true;
+
+                }
                 if (!ValidUserName(name))
                     SendUserFileMessage(user, "login/invalid_name.data");
                 else

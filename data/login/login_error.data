@@ -1,1 +1,4 @@
 <#FF0000>That login is invalid, pelase start over:<#FFFFFF>
+If you are a new user, type "new" at the prompt
+to create a new account. 
+<#00FF00>Your Name:<#FFFFFF>

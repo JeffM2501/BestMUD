@@ -14,6 +14,8 @@ namespace Core.Processors.Characters
 {
     public class CharacterCreateProcessor : PooledProcessor
     {
+        public event EventHandler<Connection> CharacterCreateComplete = null;
+
         public class CharacterCreateStateData
         {
             public string Name = string.Empty;
@@ -117,12 +119,22 @@ namespace Core.Processors.Characters
                     if (pc != null)
                     {
                         pc = PlayerCharacterDB.Instance.CreatePlayerCharacter(pc);
+
+                        if (pc != null)
+                            CharacterCreateComplete?.Invoke(this, user);
+                        else
+                        {
+                            data.Name = string.Empty;
+                            data.RaceChoice = -1;
+                            data.ClassChoice = -1;
+                            SendUserFileMessage(user, "character/name_invalid_entry.data");
+                        }
                     }
                 }
             }
             else
             {
-
+                SendUserFileMessage(user, "character/unknown_data_state.data");
             }
 
             return true;

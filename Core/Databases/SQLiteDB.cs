@@ -35,5 +35,26 @@ namespace Core.Databases
             if (DB == null)
                 return;
         }
+
+     
+    }
+
+    public static class ReaderUtils
+    {
+        public static string GetFieldString(this SQLiteDataReader results, int index)
+        {
+            if (results.IsDBNull(index) || index < 0 || index >= results.FieldCount)
+                return string.Empty;
+
+            return results.GetString(index);
+        }
+
+        public static int GetFieldInt(this SQLiteDataReader results, int index)
+        {
+            if (results.IsDBNull(index) || index < 0 || index >= results.FieldCount)
+                return int.MinValue;
+
+            return results.GetInt32(index);
+        }
     }
 }

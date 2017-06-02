@@ -45,6 +45,9 @@ namespace Core.Data.Common
         {
             AttributeList l = new AttributeList();
 
+            if (text == null || text == string.Empty)
+                return l;
+
             string[] parts = text.Split(";".ToCharArray());
             foreach (var p in parts)
             {

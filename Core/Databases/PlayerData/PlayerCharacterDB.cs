@@ -66,18 +66,18 @@ namespace Core.Databases.PlayerData
 
             if (results != null && DB != null)
             {
-                pc.UID = results.GetInt32(0);
-                pc.UserID = results.GetInt32(1);
+                pc.UID = results.GetFieldInt(0);
+                pc.UserID = results.GetFieldInt(1);
                 //int enabled = results.GetInt32(2);
-                pc.Name = results.GetString(3);
-                pc.RaceID = results.GetInt32(4);
-                pc.Level = results.GetInt32(5);
-                pc.Experience = results.GetInt32(6);
-                pc.ClassID = results.GetInt32(7);
+                pc.Name = results.GetFieldString(3);
+                pc.RaceID = results.GetFieldInt(4);
+                pc.Level = results.GetFieldInt(5);
+                pc.Experience = results.GetFieldInt(6);
+                pc.ClassID = results.GetFieldInt(7);
 
-                pc.Attributes = AttributeList.DeserlizeFromString(results.GetString(8));
-                pc.Equipment.AddRange(results.GetString(9).Split(";".ToCharArray()));
-                pc.Inventory.AddRange(results.GetString(10).Split(";".ToCharArray()));
+                pc.Attributes = AttributeList.DeserlizeFromString(results.GetFieldString(8));
+                pc.Equipment.AddRange(results.GetFieldString(9).Split(";".ToCharArray()));
+                pc.Inventory.AddRange(results.GetFieldString(10).Split(";".ToCharArray()));
 
                 if (getQuestData && DB != null)
                 {
@@ -89,7 +89,7 @@ namespace Core.Databases.PlayerData
                     if (reader.HasRows)
                     {
                         while (reader.Read())
-                            pc.QuestData.Add(new Tuple<int, string>(reader.GetInt32(0), reader.GetString(1)), reader.GetString(2));
+                            pc.QuestData.Add(new Tuple<int, string>(reader.GetFieldInt(0), reader.GetFieldString(1)), reader.GetFieldString(2));
                     }
                 }
             }
@@ -145,7 +145,7 @@ namespace Core.Databases.PlayerData
                 command.Parameters.Add(new SQLiteParameter("@level", pc.Level));
                 command.Parameters.Add(new SQLiteParameter("@exp", pc.Experience));
 
-                command.Parameters.Add(new SQLiteParameter("@att", pc.Attributes.SerializeToText());
+                command.Parameters.Add(new SQLiteParameter("@att", pc.Attributes.SerializeToText()));
                 command.Parameters.Add(new SQLiteParameter("@equip", string.Join(";", pc.Equipment.ToArray())));
                 command.Parameters.Add(new SQLiteParameter("@inv", string.Join(";", pc.Inventory.ToArray())));
 

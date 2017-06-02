@@ -103,6 +103,8 @@ namespace Networking
 
                         lock (ActiveConnections)
                             ActiveConnections.Remove(con);
+
+                        con.OnDisconnect();
                     }
                     else
                     {

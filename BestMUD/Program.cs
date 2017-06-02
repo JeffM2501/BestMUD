@@ -10,6 +10,7 @@ using Utilities;
 using Core.Databases.Authentication;
 using Core.Databases.PlayerData;
 using Core.Databases.GameData;
+using Core.Processors.Characters;
 
 namespace BestMUD
 {
@@ -49,11 +50,16 @@ namespace BestMUD
             ClassDB.Instance.Setup(Path.Combine(dataPath, "databases/default_race_class.db3"));
             RaceDB.Instance.Setup(Path.Combine(dataPath, "databases/default_race_class.db3"));
 
-            // defualt rules
+            // default rules
             Core.DefaultRules.DefaultRuleset.Init();
 
             // processor pools
-            ProcessorPool.SetupProcessorPool("Landing", typeof(LandingProcessor), 10, false, false, LandingSetup);
+           // ProcessorPool.SetupProcessorPool("Landing", typeof(LandingProcessor), 10, false, true, (s, e)=>(s as LandingProcessor).AuthenticationComplete += LandingProcessor_AuthenticationComplete);
+
+            ProcessorPool.SetupProcessorPool("Landing", typeof(LandingProcessor), 10, false, true, (s, e) => (s as LandingProcessor).AuthenticationComplete += (s1, c) => c.SetMessageProcessor(ProcessorPool.GetProcessor("CharacterSelect", c)));
+
+            ProcessorPool.SetupProcessorPool("CharacterCreate", typeof(CharacterCreateProcessor), 2, true, true, (s, e) => (s as CharacterCreateProcessor).CharacterCreateComplete += (s1, c) => c.SetMessageProcessor(ProcessorPool.GetProcessor("CharacterSelect", c)));
+            ProcessorPool.SetupProcessorPool("CharacterSelect", typeof(CharacterSelectProcessor), 2, true, true, (s, e) => (s as CharacterSelectProcessor).CharacterSelectionComplete += (s1, c) => c.SetMessageProcessor(ProcessorPool.GetProcessor("ZoneProcessor", c)));
 
             // connections
             ListeningManager.AddConnectionManager(new ConnectionManager(new Telnet.ProtocolProcessor(), GetMessageProcessor, 200)); // todo, read config and get number of connection threads and connection counts
@@ -71,20 +77,6 @@ namespace BestMUD
                 }
             }
             ListeningManager.StopAll();
-        }
-
-        private static void LandingSetup(object sender, EventArgs args)
-        {
-            LandingProcessor lp = sender as LandingProcessor;
-            if (lp == null)
-                return;
-
-            lp.AuthenticationComplete += LandingProcessor_AuthenticationComplete;
-        }
-
-        private static void LandingProcessor_AuthenticationComplete(object sender, Connection e)
-        {
-            e.SetMessageProcessor(ProcessorPool.GetProcessor("CharacterSelect",e));
         }
 
         public static IMessageProcessor GetMessageProcessor(Connection con)

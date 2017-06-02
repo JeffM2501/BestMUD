@@ -4,11 +4,14 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Data.Game.Characters;
 
 namespace Networking
 {
     public class Connection : EventArgs
     {
+        public static Connection Empty = new Connection(null);
+
         public TcpClient Socket = null;
         public NetworkStream DataStream = null;
 
@@ -24,6 +27,8 @@ namespace Networking
         public int UserID = -1;
         public List<string> AccessFlags = new List<string>();
 
+        public PlayerCharacter ActiveCharacter = null;
+
         protected readonly bool DebugEcho = false;
 
         public object MessageProcessorTag { get; protected set; }
@@ -32,13 +37,16 @@ namespace Networking
 
         public IMessageProcessor MessageProcessor { get; protected set; }
 
+        public event EventHandler<Connection> Disconnected = null;
+
 
         public Connection(TcpClient soc)
         {
             MessageProcessorTag = null;
             MessageProcessor = null;
             Socket = soc;
-            DataStream = Socket.GetStream();
+            if (soc != null)
+                DataStream = Socket.GetStream();
         }
 
         public void SetMessageProcessor(IMessageProcessor processor)
@@ -168,6 +176,11 @@ namespace Networking
         {
             lock (OutboundMessages)
                 return OutboundMessages.Count > 0;
+        }
+
+        public virtual void OnDisconnect()
+        {
+            Disconnected?.Invoke(this, this);
         }
     }
 }

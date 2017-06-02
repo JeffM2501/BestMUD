@@ -38,11 +38,12 @@ namespace Core.Databases.GameData
 
             if (results != null && DB != null)
             {
-                race.RaceID = results.GetInt32(0);
-                race.Name = results.GetString(1);
-                race.DefaultAttributeBonuses = AttributeList.DeserlizeFromString(results.GetString(2));
-                race.DefaultInventory.AddRange(results.GetString(3).Split(";".ToCharArray()));
-                race.DefaultFeatures.AddRange(results.GetString(4).Split(";".ToCharArray()));
+                race.RaceID = results.GetFieldInt(0);
+                race.Name = results.GetFieldString(1);
+
+                race.DefaultAttributeBonuses = AttributeList.DeserlizeFromString(results.GetFieldString(2));
+                race.DefaultInventory.AddRange(results.GetFieldString(3).Split(";".ToCharArray()));
+                race.DefaultFeatures.AddRange(results.GetFieldString(4).Split(";".ToCharArray()));
             }
             return race;
         }

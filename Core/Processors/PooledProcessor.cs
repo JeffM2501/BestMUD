@@ -77,7 +77,6 @@ namespace Core.Processors
 
         public virtual void ProcessInbound(string message, Connection con)
         {
-            throw new NotImplementedException();
         }
 
         public virtual void ProcessorAttach(Connection con)
@@ -136,6 +135,28 @@ namespace Core.Processors
             string data = FileTools.GetFileContents(Paths.DataPath, path, true);
             if (data == null)
                 data = path;
+            user.SendOutboundMessage(data);
+        }
+
+        protected virtual void SendUserFileMessage(Connection user, string path, Dictionary<string,string> repacements)
+        {
+            string data = FileTools.GetFileContents(Paths.DataPath, path, true);
+            if (data == null)
+                data = path;
+
+            foreach (var r in repacements)
+                data = data.Replace(r.Key, r.Value);
+
+            user.SendOutboundMessage(data);
+        }
+        protected virtual void SendUserFileMessage(Connection user, string path, string key, string value)
+        {
+            string data = FileTools.GetFileContents(Paths.DataPath, path, true);
+            if (data == null)
+                data = path;
+
+            data = data.Replace(key, value);
+
             user.SendOutboundMessage(data);
         }
     }
@@ -236,6 +257,8 @@ namespace Core.Processors
 
             lock (pool.Processors)
                 pool.Processors.Add(proc);
+
+            pool.SetupEvent?.Invoke(proc, EventArgs.Empty);
 
             if (pool.ThreadUpdates)
             {

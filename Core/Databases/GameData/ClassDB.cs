@@ -38,26 +38,26 @@ namespace Core.Databases.GameData
 
             if (results != null && DB != null)
             {
-                c.ClassID = results.GetInt32(0);
-                c.Name = results.GetString(1);
+                c.ClassID = results.GetFieldInt(0);
+                c.Name = results.GetFieldString(1);
 
                 try
                 {
-                    foreach (string s in results.GetString(2).Split(";".ToCharArray()))
+                    foreach (string s in results.GetFieldString(2).Split(";".ToCharArray()))
                         c.AllowedRaces.Add(int.Parse(s));
                 }
                 catch (Exception /*ex*/) { }
 
                 try
                 {
-                    foreach (string s in results.GetString(3).Split(";".ToCharArray()))
+                    foreach (string s in results.GetFieldString(3).Split(";".ToCharArray()))
                         c.RestrictedRaces.Add(int.Parse(s));
                 }
                 catch (Exception /*ex*/) { }
 
-                c.DefaultAttributeBonuses = AttributeList.DeserlizeFromString(results.GetString(4));
-                c.DefaultInventory.AddRange(results.GetString(5).Split(";".ToCharArray()));
-                c.DefaultFeatures.AddRange(results.GetString(6).Split(";".ToCharArray()));
+                c.DefaultAttributeBonuses = AttributeList.DeserlizeFromString(results.GetFieldString(4));
+                c.DefaultInventory.AddRange(results.GetFieldString(5).Split(";".ToCharArray()));
+                c.DefaultFeatures.AddRange(results.GetFieldString(6).Split(";".ToCharArray()));
             }
             return c;
         }

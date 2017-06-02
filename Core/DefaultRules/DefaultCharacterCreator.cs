@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Data.Common;
 using Core.Data.Game.Characters;
 using Core.Data.Game.Classes;
 using Core.Data.Game.Races;
@@ -26,12 +27,12 @@ namespace Core.DefaultRules
                 pc.Inventory.Add(classItem);
 
             // attributes
-            pc.Attributes.Add("Strength", 8);
-            pc.Attributes.Add("Dexterity", 8);
-            pc.Attributes.Add("Constitution", 8);
-            pc.Attributes.Add("Intelligence", 8);
-            pc.Attributes.Add("Wisdom", 8);
-            pc.Attributes.Add("Charisma", 8);
+            pc.Attributes.Add(BasicAttributes.Strenght, 8);
+            pc.Attributes.Add(BasicAttributes.Dexterity, 8);
+            pc.Attributes.Add(BasicAttributes.Constitution, 8);
+            pc.Attributes.Add(BasicAttributes.Intelligence, 8);
+            pc.Attributes.Add(BasicAttributes.Wisdom, 8);
+            pc.Attributes.Add(BasicAttributes.Charisma, 8);
 
             pc.Attributes.Merge(raceData.DefaultAttributeBonuses);
             pc.Attributes.Merge(classData.DefaultAttributeBonuses);

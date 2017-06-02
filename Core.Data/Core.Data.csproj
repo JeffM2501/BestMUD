@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\AttributeList.cs" />
+    <Compile Include="Common\BasicAttributes.cs" />
     <Compile Include="Game\Characters\PlayerCharacter.cs" />
     <Compile Include="Game\Classes\ClassInfo.cs" />
     <Compile Include="Game\Races\RaceInfo.cs" />

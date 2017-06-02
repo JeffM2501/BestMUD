@@ -54,6 +54,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.Data\Core.Data.csproj">
+      <Project>{875BDD2A-CE63-4F54-9957-08BC0A421C41}</Project>
+      <Name>Core.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Utilities\Utilities.csproj">
       <Project>{2d9488b6-935d-4e72-989c-898968fbc927}</Project>
       <Name>Utilities</Name>

@@ -42,6 +42,8 @@ namespace Core.Data.Game.Characters
         public List<string> Equipment = new List<string>();
         public List<string> Inventory = new List<string>();
 
+        public KeyValueList ExtraAttributes = new KeyValueList();
+
         public Dictionary<Tuple<int, string>, string> QuestData = new Dictionary<Tuple<int, string>, string>();
     }
 }

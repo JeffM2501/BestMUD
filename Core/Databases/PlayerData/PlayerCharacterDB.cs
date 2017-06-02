@@ -24,7 +24,7 @@ namespace Core.Databases.PlayerData
             var results = command.ExecuteReader();
             if (!results.HasRows)
             {
-                sql = "CREATE TABLE characters ( characterID INTEGER PRIMARY KEY AUTOINCREMENT,userID INTEGER,enabled INTEGER,name TEXT,raceID INTEGER,level INTEGER,experience INTEGER,classID INTEGER, attributeData TEXT,equipmentData TEXT,inventoryData TEXT );";
+                sql = "CREATE TABLE characters ( characterID INTEGER PRIMARY KEY AUTOINCREMENT,userID INTEGER,enabled INTEGER,name TEXT,raceID INTEGER,level INTEGER,experience INTEGER,classID INTEGER, attributeData TEXT,equipmentData TEXT,inventoryData TEXT, extraAttributes TEXT );";
                 command = new SQLiteCommand(sql, DB);
                 command.ExecuteNonQuery();
             }
@@ -78,6 +78,7 @@ namespace Core.Databases.PlayerData
                 pc.Attributes = AttributeList.DeserlizeFromString(results.GetFieldString(8));
                 pc.Equipment.AddRange(results.GetFieldString(9).Split(";".ToCharArray()));
                 pc.Inventory.AddRange(results.GetFieldString(10).Split(";".ToCharArray()));
+                pc.ExtraAttributes = KeyValueList.DeserlizeFromString(results.GetFieldString(11));
 
                 if (getQuestData && DB != null)
                 {
@@ -136,7 +137,7 @@ namespace Core.Databases.PlayerData
                 if (pc.ReadOnly)
                     return;
 
-                string sql = "UPDATE characters  Set name=@name, raceID=@raceID, level=@level, experience=@exp, classID=@classID, attributeData=@att, equipmentData=@equip, inventoryData=@inv WHERE characterID=@cid AND userID=@uid AND enabled=1);";
+                string sql = "UPDATE characters  Set name=@name, raceID=@raceID, level=@level, experience=@exp, classID=@classID, attributeData=@att, equipmentData=@equip, inventoryData=@inv, extraAttributes=@ext WHERE characterID=@cid AND userID=@uid AND enabled=1);";
                 SQLiteCommand command = new SQLiteCommand(sql, DB);
 
                 command.Parameters.Add(new SQLiteParameter("@name", pc.Name));
@@ -151,6 +152,7 @@ namespace Core.Databases.PlayerData
 
                 command.Parameters.Add(new SQLiteParameter("@uid", pc.UserID));
                 command.Parameters.Add(new SQLiteParameter("@cid", pc.UID));
+                command.Parameters.Add(new SQLiteParameter("@ext", pc.ExtraAttributes.SerializeToText()));
                 command.ExecuteNonQuery();
 
                 pc.Dirty = false;

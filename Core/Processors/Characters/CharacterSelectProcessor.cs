@@ -68,9 +68,9 @@ namespace Core.Processors.Characters
             SendUserFileMessage(user, "character/select_character_footer.data");
         }
 
-        public override void ProcessInbound(string message, Connection user)
+        protected override bool ProcessUserMessage(Connection user, string msg)
         {
-            base.ProcessInbound(message, user);
+            base.ProcessUserMessage(user, msg);
 
             var data = GetConStateData<CharacterSelectStateData>(user);
 
@@ -82,7 +82,7 @@ namespace Core.Processors.Characters
             else
             {
                 int selection = -1;
-                int.TryParse(message, out selection);
+                int.TryParse(msg, out selection);
 
                 if (selection == 0)
                     user.SetMessageProcessor(ProcessorPool.GetProcessor("CharacterCreate", user));
@@ -112,7 +112,10 @@ namespace Core.Processors.Characters
                     }
                 }
             }
+
+            return true;
         }
+
         protected override void ProcessConnection(Connection con)
         {
             base.ProcessConnection(con);

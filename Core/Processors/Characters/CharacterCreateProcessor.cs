@@ -33,24 +33,24 @@ namespace Core.Processors.Characters
             var data = GetConStateData<CharacterCreateStateData>(con);
 
             // send out the create name message
-            SendUserFileMessage(con, "character/character_name.data");
+            SendUserFileMessage(con, "character/create/character_name.data");
         }
 
         protected void ShowRaceList(Connection user)
         {
-            SendUserFileMessage(user, "character/race_list_start.data");
+            SendUserFileMessage(user, "character/create/race_list_header.data");
 
             var races = RaceDB.Instance.GetRaceList();
             races = Scripting.Register.CharacterHandler?.FilterRaces(user, races);
 
             for (int i = 1; i <= races.Length; i++)
-                user.SendOutboundMessage(string.Format("{0}. {1}", i, races[i].Name));
-            SendUserFileMessage(user, "character/race_list_end.data");
+                user.SendOutboundMessage(string.Format("{0}. {1}", i, races[i-1].Name));
+            SendUserFileMessage(user, "character/create/race_list_footer.data");
         }
 
         protected void ShowClassList(Connection user, CharacterCreateStateData data)
         {
-            SendUserFileMessage(user, "character/class_list_start.data");
+            SendUserFileMessage(user, "character/create/class_list_header.data");
 
             var classes = ClassDB.Instance.GetClassList();
             classes = Scripting.Register.CharacterHandler?.FilterClasses(user, RaceDB.Instance.FindRace(data.RaceChoice), classes);
@@ -59,25 +59,26 @@ namespace Core.Processors.Characters
 
             for (int i = 1; i <= classes.Length; i++)
             {
-                user.SendOutboundMessage(string.Format("{0}. {1}", i, classes[i].Name));
+                user.SendOutboundMessage(string.Format("{0}. {1}", i, classes[i-1].Name));
                 classIndexes.Add(classes[i].ClassID);
             }
             data.ClassIndexes = classIndexes.ToArray();
                
-            SendUserFileMessage(user, "character/class_list_end.data");
+            SendUserFileMessage(user, "character/create/class_list_footer.data");
         }
 
         protected override bool ProcessUserMessage(Connection user, string msg)
         {
-            if (!base.ProcessUserMessage(user, msg))
-                return false;
+            if (base.ProcessUserMessage(user, msg))
+                return true;
+
             var data = GetConStateData<CharacterCreateStateData>(user);
 
             if (data.Name == string.Empty)
             {
                 if (PlayerCharacterDB.Instance.PCNameExists(msg))
                 {
-                    SendUserFileMessage(user, "character/name_invalid_entry.data");
+                    SendUserFileMessage(user, "character/create/name_invalid_entry.data");
                 }
                 else
                 {
@@ -91,13 +92,13 @@ namespace Core.Processors.Characters
                 int index = -1;
                 if (!int.TryParse(msg,out index) || index < 1 || index > data.RaceIndexes.Length)
                 {
-                    SendUserFileMessage(user, "character/race_list_invalid_entry.data");
+                    SendUserFileMessage(user, "character/create/race_list_invalid_entry.data");
                     ShowRaceList(user);
                 }
                 else
                 {
                     data.RaceChoice = data.RaceIndexes[index-1];
-                    SendUserFileMessage(user, "character/character_name.data");
+                    SendUserFileMessage(user, "character/create/character_name.data");
                     ShowClassList(user,data);
                 }
             }
@@ -106,7 +107,7 @@ namespace Core.Processors.Characters
                 int index = -1;
                 if (!int.TryParse(msg, out index) || index < 1 || index > data.RaceIndexes.Length)
                 {
-                    SendUserFileMessage(user, "character/class_list_invalid_entry.data");
+                    SendUserFileMessage(user, "character/create/class_list_invalid_entry.data");
                     ShowClassList(user, data);
                 }
                 else
@@ -127,7 +128,7 @@ namespace Core.Processors.Characters
                             data.Name = string.Empty;
                             data.RaceChoice = -1;
                             data.ClassChoice = -1;
-                            SendUserFileMessage(user, "character/name_invalid_entry.data");
+                            SendUserFileMessage(user, "character/create/name_invalid_entry.data");
                         }
                     }
                 }

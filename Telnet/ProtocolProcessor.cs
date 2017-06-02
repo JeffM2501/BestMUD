@@ -109,7 +109,7 @@ namespace Telnet
                     buffer.Append(c);
             }
 
-            buffer.Append("\r\n");
+         //   buffer.Append("\r\n");
             return true;
         }
     }

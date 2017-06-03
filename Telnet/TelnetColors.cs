@@ -98,6 +98,10 @@ namespace Telnet
             NamedColorCache.Add("$bold", bold);
             NamedColorCache.Add("$dim", dim);
             NamedColorCache.Add("$reset", reset);
+            NamedColorCache.Add("$hide", hide);
+
+            NamedColorCache.Add("$clearscreen", clearscreen);
+            NamedColorCache.Add("$clearline", clearline);
         }
 
         public static string TranslateBMCode(string input)

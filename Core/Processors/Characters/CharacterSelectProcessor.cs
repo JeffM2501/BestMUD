@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using Core.Processors;
 using Core.Databases.PlayerData;
+using Utilities;
 
 namespace Core.Processors.Characters
 {
@@ -57,13 +58,12 @@ namespace Core.Processors.Characters
 
             SendUserFileMessage(user, "character/select_character_header.data");
             SendUserFileMessage(user, "character/create_character_list_index.data");
-            user.SendOutboundMessage("0. Create Character");
-
+ 
             data.CharacterIndexes.Clear();
             foreach (var c in chars)
             {
                 data.CharacterIndexes.Add(c.UID);
-                user.SendOutboundMessage(string.Format("{0}. {1}", data.CharacterIndexes.Count, c.Name));
+                user.SendOutboundMessage(string.Format("{0}. {1}\n", data.CharacterIndexes.Count, c.Name));
             }
             SendUserFileMessage(user, "character/select_character_footer.data");
         }
@@ -88,7 +88,7 @@ namespace Core.Processors.Characters
                     user.SetMessageProcessor(ProcessorPool.GetProcessor("CharacterCreate", user));
                 else
                 {
-                    if (selection < 0 || selection >= data.CharacterIndexes.Count)
+                    if (selection < 1 || selection > data.CharacterIndexes.Count)
                     {
                         SendUserFileMessage(user, "character/invalid_character_selection.data");
                         ShowCharacterList(user);
@@ -98,7 +98,7 @@ namespace Core.Processors.Characters
                         if (user.ActiveCharacter != null)
                             PlayerCharacterDB.Instance.CheckInCharacter(user.ActiveCharacter);
 
-                        user.ActiveCharacter = PlayerCharacterDB.Instance.CheckOutChracter(user.UserID, data.CharacterIndexes[selection]);
+                        user.ActiveCharacter = PlayerCharacterDB.Instance.CheckOutChracter(user.UserID, data.CharacterIndexes[selection-1]);
                         if (user.ActiveCharacter == null)
                         {
                             SendUserFileMessage(user, "character/invalid_character_selection.data");
@@ -106,6 +106,8 @@ namespace Core.Processors.Characters
                         }
                         else
                         {
+                            LogCache.Log(LogCache.BasicLog, "User Joining as:(" + user.UserID.ToString() + ")" + user.ActiveCharacter.UID.ToString() + ":" + user.ActiveCharacter.Name);
+
                             SendUserFileMessage(user, "character/select_character_join_as.data", "<!CHAR_NAME>", user.ActiveCharacter.Name);
                             CharacterSelectionComplete?.Invoke(this, user);
                         }

@@ -9,6 +9,7 @@ using Core.Processors;
 using Core.Databases.GameData;
 using Core.Databases.PlayerData;
 using Core.Data.Game.Characters;
+using Utilities;
 
 namespace Core.Processors.Characters
 {
@@ -44,7 +45,7 @@ namespace Core.Processors.Characters
             races = Scripting.Register.CharacterHandler?.FilterRaces(user, races);
 
             for (int i = 1; i <= races.Length; i++)
-                user.SendOutboundMessage(string.Format("{0}. {1}", i, races[i-1].Name));
+                user.SendOutboundMessage(string.Format("{0}. {1}\n", i, races[i-1].Name));
             SendUserFileMessage(user, "character/create/race_list_footer.data");
         }
 
@@ -59,8 +60,8 @@ namespace Core.Processors.Characters
 
             for (int i = 1; i <= classes.Length; i++)
             {
-                user.SendOutboundMessage(string.Format("{0}. {1}", i, classes[i-1].Name));
-                classIndexes.Add(classes[i].ClassID);
+                user.SendOutboundMessage(string.Format("{0}. {1}\n", i, classes[i-1].Name));
+                classIndexes.Add(classes[i-1].ClassID);
             }
             data.ClassIndexes = classIndexes.ToArray();
                
@@ -119,10 +120,17 @@ namespace Core.Processors.Characters
                     pc = Scripting.Register.CharacterHandler?.CreateCharacter(user, RaceDB.Instance.FindRace(data.RaceChoice), ClassDB.Instance.FindClass(data.ClassChoice));
                     if (pc != null)
                     {
+                        pc.Name = data.Name;
+                        pc.UserID = user.UserID;
+
                         pc = PlayerCharacterDB.Instance.CreatePlayerCharacter(pc);
 
                         if (pc != null)
+                        {
+                            LogCache.Log(LogCache.BasicLog, "Character Created:(" + user.UserID.ToString() + ")" + pc.UID.ToString() + ":" + pc.Name);
                             CharacterCreateComplete?.Invoke(this, user);
+                        }
+                          
                         else
                         {
                             data.Name = string.Empty;

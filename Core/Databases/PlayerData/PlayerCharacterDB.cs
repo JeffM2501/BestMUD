@@ -82,7 +82,7 @@ namespace Core.Databases.PlayerData
 
                 if (getQuestData && DB != null)
                 {
-                    string sql = "SELECT * FROM qyestData WHERE characterID=@cid;";
+                    string sql = "SELECT * FROM questData WHERE characterID=@cid;";
                     SQLiteCommand command = new SQLiteCommand(sql, DB);
                     command.Parameters.Add(new SQLiteParameter("@cid", pc.UID));
 
@@ -137,11 +137,11 @@ namespace Core.Databases.PlayerData
                 if (pc.ReadOnly)
                     return;
 
-                string sql = "UPDATE characters  Set name=@name, raceID=@raceID, level=@level, experience=@exp, classID=@classID, attributeData=@att, equipmentData=@equip, inventoryData=@inv, extraAttributes=@ext WHERE characterID=@cid AND userID=@uid AND enabled=1);";
+                string sql = "UPDATE characters Set name=@name, raceID=@raceID, level=@level, experience=@exp, classID=@classID, attributeData=@att, equipmentData=@equip, inventoryData=@inv, extraAttributes=@ext WHERE characterID=@cid AND userID=@uid AND enabled=1;";
                 SQLiteCommand command = new SQLiteCommand(sql, DB);
 
                 command.Parameters.Add(new SQLiteParameter("@name", pc.Name));
-                command.Parameters.Add(new SQLiteParameter("@faceID", pc.RaceID));
+                command.Parameters.Add(new SQLiteParameter("@raceID", pc.RaceID));
                 command.Parameters.Add(new SQLiteParameter("@classID", pc.ClassID));
                 command.Parameters.Add(new SQLiteParameter("@level", pc.Level));
                 command.Parameters.Add(new SQLiteParameter("@exp", pc.Experience));
@@ -149,11 +149,19 @@ namespace Core.Databases.PlayerData
                 command.Parameters.Add(new SQLiteParameter("@att", pc.Attributes.SerializeToText()));
                 command.Parameters.Add(new SQLiteParameter("@equip", string.Join(";", pc.Equipment.ToArray())));
                 command.Parameters.Add(new SQLiteParameter("@inv", string.Join(";", pc.Inventory.ToArray())));
+                command.Parameters.Add(new SQLiteParameter("@ext", pc.ExtraAttributes.SerializeToText()));
 
                 command.Parameters.Add(new SQLiteParameter("@uid", pc.UserID));
                 command.Parameters.Add(new SQLiteParameter("@cid", pc.UID));
-                command.Parameters.Add(new SQLiteParameter("@ext", pc.ExtraAttributes.SerializeToText()));
-                command.ExecuteNonQuery();
+                
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch(Exception ex)
+                {
+
+                }
 
                 pc.Dirty = false;
             }

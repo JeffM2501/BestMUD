@@ -167,6 +167,10 @@ namespace Core.Processors
             if (authFlags != string.Empty)
                 user.AccessFlags.AddRange(authFlags.Split(";".ToCharArray()));
 
+            if (data.NeedUserCreate)
+                LogCache.Log(LogCache.BasicLog, "User Created:(" + user.UserID.ToString() + ")" + data.UserName);
+
+            LogCache.Log(LogCache.NetworkLog, "User Authenticated:(" + user.UserID.ToString() + ")" + data.UserName);
             // send them to the next handler
             AuthenticationComplete?.Invoke(this, user);
             return user.MessageProcessor == this;

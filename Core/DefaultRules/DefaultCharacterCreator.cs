@@ -17,6 +17,7 @@ namespace Core.DefaultRules
         public PlayerCharacter CreateCharacter(Connection user, RaceInfo raceData, ClassInfo classData)
         {
             PlayerCharacter pc = new PlayerCharacter(true);
+            pc.UserID = user.UserID;
             pc.ClassID = classData.ClassID;
             pc.RaceID = raceData.RaceID;
 

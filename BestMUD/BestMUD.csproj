@@ -72,6 +72,10 @@
       <Project>{1d77c062-a8ba-47e7-81da-c5af01080fb0}</Project>
       <Name>Networking</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Scripting\Scripting.csproj">
+      <Project>{4d320710-217e-4f2f-9d57-c054ea7ab2d9}</Project>
+      <Name>Scripting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Telnet\Telnet.csproj">
       <Project>{1755a8d8-dee6-4577-9e6a-9ec091b4837b}</Project>
       <Name>Telnet</Name>

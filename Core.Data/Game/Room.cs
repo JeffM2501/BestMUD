@@ -27,4 +27,11 @@ namespace Core.Data.Game
         public string Description = string.Empty;
         public List<Exit> Exits = new List<Exit>();
     }
+
+    public class Zone
+    {
+        public int ID = int.MinValue;
+        public string Name = string.Empty;
+        public List<Room> Rooms = new List<Room>();
+    }
 }

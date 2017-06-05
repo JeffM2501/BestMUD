@@ -13,12 +13,12 @@ namespace Core.Databases.GameData
         {
             base.ValidateDatabase();
 
-            string sql = "SELECT name FROM " + DB.Database + ".sqlite_master WHERE type='table' AND name='zones';";
+            string sql = "SELECT name FROM " + DB.Database + ".sqlite_master WHERE type='table' AND name='rooms';";
             SQLiteCommand command = new SQLiteCommand(sql, DB);
             var results = command.ExecuteReader();
             if (!results.HasRows)
             {
-                sql = "CREATE TABLE zones(zoneID INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,attributes TEXT);";
+                sql = "CREATE TABLE room (roomID INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,attributes TEXT);";
                 command = new SQLiteCommand(sql, DB);
                 command.ExecuteNonQuery();
             }
@@ -28,7 +28,7 @@ namespace Core.Databases.GameData
             results = command.ExecuteReader();
             if (!results.HasRows)
             {
-                sql = "CREATE TABLE exits(exitID INTEGER PRIMARY KEY AUTOINCREMENT,zoneID INTEGER REFERENCES zones(zoneID),direction INTEGER,destinationZoneID INTEGER REFERENCES zones(zoneID), destinationExitID INTEGER, attributes TEXT);";
+                sql = "CREATE TABLE exits(exitID INTEGER PRIMARY KEY AUTOINCREMENT,roomID INTEGER REFERENCES roooms(roomID),direction INTEGER,destinationZoneID INTEGER REFERENCES rooms(roomID), destinationExitID INTEGER, attributes TEXT);";
                 command = new SQLiteCommand(sql, DB);
                 command.ExecuteNonQuery();
             }

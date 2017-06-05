@@ -42,10 +42,12 @@
   <ItemGroup>
     <Compile Include="Common\AttributeList.cs" />
     <Compile Include="Common\BasicAttributes.cs" />
+    <Compile Include="Common\Directions.cs" />
     <Compile Include="Common\KeyValueList.cs" />
     <Compile Include="Game\Characters\PlayerCharacter.cs" />
     <Compile Include="Game\Classes\ClassInfo.cs" />
     <Compile Include="Game\Races\RaceInfo.cs" />
+    <Compile Include="Game\Room.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

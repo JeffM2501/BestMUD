@@ -9,6 +9,8 @@ namespace Core.Databases.GameData
 {
     public class ZoneDB : SQLiteDB
     {
+        public static RaceDB Instance = new RaceDB();
+
         protected override void ValidateDatabase()
         {
             base.ValidateDatabase();

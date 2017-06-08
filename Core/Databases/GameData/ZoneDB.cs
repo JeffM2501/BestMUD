@@ -82,7 +82,7 @@ namespace Core.Databases.GameData
         {
             string tempName = RNG.PsudoGUID();
 
-            string sql = "INSERT into rooms (Name) VALUES (@name);";
+            string sql = "INSERT into rooms (name) VALUES (@name);";
             SQLiteCommand command = new SQLiteCommand(sql, DB);
             command.Parameters.Add(new SQLiteParameter("@name", tempName));
             command.ExecuteNonQuery();
@@ -95,25 +95,70 @@ namespace Core.Databases.GameData
                 return -1;
 
             room.UID = results.GetInt32(0);
-            WriteRoomData(room.UID, room);
+            WriteRoomData(room);
 
             return room.UID;
         }
 
-        protected void WriteRoomData(int id, Room room)
+        public int AddExit(Room room, Room.Exit exit)
+        {
+            string tempName = RNG.PsudoGUID();
+
+            string sql = "INSERT into exits (roomID, attributes) VALUES (@id, @name);";
+            SQLiteCommand command = new SQLiteCommand(sql, DB);
+            command.Parameters.Add(new SQLiteParameter("@roomID", room.UID));
+            command.Parameters.Add(new SQLiteParameter("@name", tempName));
+            command.ExecuteNonQuery();
+
+            sql = "SELECT exitID from exits where roomID=@id AND attributes=@name;";
+            command.Parameters.Add(new SQLiteParameter("@id", room.UID));
+            command.Parameters.Add(new SQLiteParameter("@name", tempName));
+
+            var results = command.ExecuteReader();
+            if (!results.HasRows || !results.Read())
+                return -1;
+
+            exit.ID = results.GetInt32(0);
+            return exit.ID;
+        }
+
+        public void DeleteExit(Room room, Room.Exit exit)
+        {
+            string sql = "DELETE FROM exits WHERE exitID=@id;";
+            SQLiteCommand command = new SQLiteCommand(sql, DB);
+            command.Parameters.Add(new SQLiteParameter("@id", exit.ID));
+            command.ExecuteNonQuery();
+
+            FileTools.DeleteFile(Paths.DataPath, "zone", room.UID.ToString(), "exit_" + exit.ID.ToString() + ".data");
+
+            room.Exits.Remove(exit);
+        }
+
+        protected void WriteRoomData(Room room)
         {
             string sql = "UPDATE rooms SET (Name=@name,attributes=@att) where roomID=@id;";
             SQLiteCommand command = new SQLiteCommand(sql, DB);
             command.Parameters.Add(new SQLiteParameter("@name", room.Name));
             command.Parameters.Add(new SQLiteParameter("@att", room.Attributes.SerializeToText()));
-            command.Parameters.Add(new SQLiteParameter("@id", id));
+            command.Parameters.Add(new SQLiteParameter("@id", room.UID));
             command.ExecuteNonQuery();
 
-            List<int> existingExits = new List<int>();
-            sql = "SELECT exitID FROM exits where roomID=@id;";
-            command.Parameters.Add(new SQLiteParameter("@id", id));
+            FileTools.SetFileContents(Paths.DataPath, "zone", room.UID.ToString(), "desc.data", room.Description);
 
-            var results = command.ExecuteReader();
+            foreach(var exit in room.Exits)// set the exits to current data
+            {
+                sql = "UPDATE exits Set (direction=@dir, destinationZoneID=@destRID, destinationExitID =@destEID, attributes=@att) WHERE exitID=@eID AND roomID=@rid;";
+                command = new SQLiteCommand(sql, DB);
+                command.Parameters.Add(new SQLiteParameter("@eID", exit.ID);
+                command.Parameters.Add(new SQLiteParameter("@rID", room.UID));
+                command.Parameters.Add(new SQLiteParameter("@dir", (int)exit.Direction));
+                command.Parameters.Add(new SQLiteParameter("@destRID", exit.Destination));
+                command.Parameters.Add(new SQLiteParameter("@destEID", exit.DesinationExit));
+                command.Parameters.Add(new SQLiteParameter("@att", exit.Attributes.SerializeToText()));
+                command.ExecuteNonQuery();
+
+                FileTools.SetFileContents(Paths.DataPath, "zone", room.UID.ToString(), "exit_" + exit.ID.ToString() + ".data", exit.Description);
+            }
         }
 
         protected bool ReadRoomData(int id, Room room)

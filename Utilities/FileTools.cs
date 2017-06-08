@@ -55,6 +55,71 @@ namespace Utilities
             return t;
         }
 
-        
+        public static void SetFileContents(FileInfo file, string data)
+        {
+            if (file.Exists)
+                file.Delete();
+
+            var fs = file.OpenWrite();
+            StreamWriter sw = new StreamWriter(fs);
+            sw.Write(data);
+            sw.Close();
+            fs.Close();
+        }
+
+        public static void SetFileContents(DirectoryInfo root, string path, string data)
+        {
+            if (root == null)
+                return ;
+
+            SetFileContents(new FileInfo(Path.Combine(root.FullName, path)), data);
+        }
+
+        public static void SetFileContents(DirectoryInfo root, string dir, string name, string data)
+        {
+            if (root == null)
+                return;
+
+            SetFileContents(new FileInfo(Path.Combine(root.FullName, dir, name)), data);
+        }
+
+        public static void SetFileContents(DirectoryInfo root, string dir, string dir2, string name, string data)
+        {
+            if (root == null)
+                return;
+
+            SetFileContents(new FileInfo(Path.Combine(root.FullName, dir, dir2, name)), data);
+        }
+
+
+        public static void DeleteFile (FileInfo file)
+        {
+            if (file.Exists)
+                file.Delete();
+        }
+
+        public static void DeleteFile(DirectoryInfo root, string path)
+        {
+            if (root == null)
+                return;
+
+            DeleteFile(new FileInfo(Path.Combine(root.FullName, path)));
+        }
+
+        public static void DeleteFile(DirectoryInfo root, string dir, string name)
+        {
+            if (root == null)
+                return;
+
+            DeleteFile(new FileInfo(Path.Combine(root.FullName, dir, name)));
+        }
+
+        public static void DeleteFile(DirectoryInfo root, string dir, string dir2, string name)
+        {
+            if (root == null)
+                return;
+
+            DeleteFile(new FileInfo(Path.Combine(root.FullName, dir, dir2, name)));
+        }
     }
 }

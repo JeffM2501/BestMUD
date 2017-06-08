@@ -17,11 +17,11 @@ namespace Core.Data.Game
 
             public Directions Direction = Directions.Unknown;
             public string Description = string.Empty;
-            public List<string> Attributes = new List<string>();
+            public KeyValueList Attributes = new KeyValueList();
         }
 
         public int UID = int.MinValue;
-        public List<string> Attributes = new List<string>();
+        public KeyValueList Attributes = new KeyValueList();
         public string Name = string.Empty;
 
         public string Description = string.Empty;

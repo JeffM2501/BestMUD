@@ -226,7 +226,7 @@ namespace Core.Databases.PlayerData
                 var results = command.ExecuteReader();
                 if (!results.HasRows)
                     return null;
-                results.Read(); ;
+                results.Read();
                 pc.FinalizeCreate(results.GetInt32(0));
                 SavePlayerCharacter(pc);
 

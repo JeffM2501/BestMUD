@@ -15,10 +15,30 @@ namespace Utilities
             if (root == null)
                 return null;
 
-            FileInfo file = new FileInfo(Path.Combine(root.FullName, path));
+            return GetFileContents(new FileInfo(Path.Combine(root.FullName, path)),useCache);
+        }
+
+        public static string GetFileContents(DirectoryInfo root, string dir, string name, bool useCache)
+        {
+            if (root == null)
+                return null;
+
+            return GetFileContents(new FileInfo(Path.Combine(root.FullName, dir, name)), useCache);
+        }
+
+        public static string GetFileContents(DirectoryInfo root, string dir, string dir2, string name, bool useCache)
+        {
+            if (root == null)
+                return null;
+
+            return GetFileContents(new FileInfo(Path.Combine(root.FullName, dir, dir2, name)), useCache);
+        }
+
+        public static string GetFileContents(FileInfo file, bool useCache)
+        {
             if (!file.Exists)
             {
-                LogCache.Log(LogCache.BasicLog, "Requested File not found: " + path);
+                LogCache.Log(LogCache.BasicLog, "Requested File not found: " + file.Name);
                 return null;
             }
 
@@ -34,5 +54,7 @@ namespace Utilities
 
             return t;
         }
+
+        
     }
 }

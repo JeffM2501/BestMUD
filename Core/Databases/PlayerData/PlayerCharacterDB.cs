@@ -24,7 +24,7 @@ namespace Core.Databases.PlayerData
             var results = command.ExecuteReader();
             if (!results.HasRows)
             {
-                sql = "CREATE TABLE characters ( characterID INTEGER PRIMARY KEY AUTOINCREMENT,userID INTEGER,enabled INTEGER,name TEXT,raceID INTEGER,level INTEGER,experience INTEGER,classID INTEGER, attributeData TEXT,equipmentData TEXT,inventoryData TEXT, extraAttributes TEXT );";
+                sql = "CREATE TABLE characters ( characterID INTEGER PRIMARY KEY AUTOINCREMENT,userID INTEGER,enabled INTEGER,name TEXT,raceID INTEGER,level INTEGER,experience INTEGER,classID INTEGER, currentRoom INTEGER,attributeData TEXT,equipmentData TEXT,inventoryData TEXT, extraAttributes TEXT );";
                 command = new SQLiteCommand(sql, DB);
                 command.ExecuteNonQuery();
             }
@@ -74,11 +74,12 @@ namespace Core.Databases.PlayerData
                 pc.Level = results.GetFieldInt(5);
                 pc.Experience = results.GetFieldInt(6);
                 pc.ClassID = results.GetFieldInt(7);
+                pc.CurrentRoom = results.GetFieldInt(8);
 
-                pc.Attributes = AttributeList.DeserlizeFromString(results.GetFieldString(8));
-                pc.Equipment.AddRange(results.GetFieldString(9).Split(";".ToCharArray()));
-                pc.Inventory.AddRange(results.GetFieldString(10).Split(";".ToCharArray()));
-                pc.ExtraAttributes = KeyValueList.DeserlizeFromString(results.GetFieldString(11));
+                pc.Attributes = AttributeList.DeserlizeFromString(results.GetFieldString(9));
+                pc.Equipment.AddRange(results.GetFieldString(10).Split(";".ToCharArray()));
+                pc.Inventory.AddRange(results.GetFieldString(11).Split(";".ToCharArray()));
+                pc.ExtraAttributes = KeyValueList.DeserlizeFromString(results.GetFieldString(12));
 
                 if (getQuestData && DB != null)
                 {
@@ -137,12 +138,13 @@ namespace Core.Databases.PlayerData
                 if (pc.ReadOnly)
                     return;
 
-                string sql = "UPDATE characters Set name=@name, raceID=@raceID, level=@level, experience=@exp, classID=@classID, attributeData=@att, equipmentData=@equip, inventoryData=@inv, extraAttributes=@ext WHERE characterID=@cid AND userID=@uid AND enabled=1;";
+                string sql = "UPDATE characters Set name=@name, raceID=@raceID, level=@level, experience=@exp, classID=@classID, currentRoom=@room, attributeData=@att, equipmentData=@equip, inventoryData=@inv, extraAttributes=@ext WHERE characterID=@cid AND userID=@uid AND enabled=1;";
                 SQLiteCommand command = new SQLiteCommand(sql, DB);
 
                 command.Parameters.Add(new SQLiteParameter("@name", pc.Name));
                 command.Parameters.Add(new SQLiteParameter("@raceID", pc.RaceID));
                 command.Parameters.Add(new SQLiteParameter("@classID", pc.ClassID));
+                command.Parameters.Add(new SQLiteParameter("@room", pc.CurrentRoom));
                 command.Parameters.Add(new SQLiteParameter("@level", pc.Level));
                 command.Parameters.Add(new SQLiteParameter("@exp", pc.Experience));
 

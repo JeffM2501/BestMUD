@@ -14,6 +14,7 @@ using Core.Config;
 using Networking;
 using Utilities;
 using Scripting;
+using Core.Processors.World;
 
 namespace BestMUD
 {
@@ -76,15 +77,16 @@ namespace BestMUD
             PlayerCharacterDB.Instance.Setup(Path.Combine(dbPath, "player_characters.db3"));
             ClassDB.Instance.Setup(Path.Combine(dbPath, "default_race_class.db3"));
             RaceDB.Instance.Setup(Path.Combine(dbPath, "default_race_class.db3"));
+            ZoneDB.Instance.Setup(Path.Combine(dbPath, "zones.db3"));
 
             // default rules
             Core.DefaultRules.DefaultRuleset.Init();
 
             // processor pools
             ProcessorPool.SetupProcessorPool("Landing", typeof(LandingProcessor), Config.LandingThreads, false, true, (s, e) => (s as LandingProcessor).AuthenticationComplete += (s1, c) => c.SetMessageProcessor(ProcessorPool.GetProcessor("CharacterSelect", c)));
-
             ProcessorPool.SetupProcessorPool("CharacterCreate", typeof(CharacterCreateProcessor), Config.CharacterCreateThreads, true, true, (s, e) => (s as CharacterCreateProcessor).CharacterCreateComplete += (s1, c) => c.SetMessageProcessor(ProcessorPool.GetProcessor("CharacterSelect", c)));
-            ProcessorPool.SetupProcessorPool("CharacterSelect", typeof(CharacterSelectProcessor), Config.CharacterSelectThreads, true, true, (s, e) => (s as CharacterSelectProcessor).CharacterSelectionComplete += (s1, c) => c.SetMessageProcessor(ProcessorPool.GetProcessor("ZoneProcessor", c)));
+            ProcessorPool.SetupProcessorPool("CharacterSelect", typeof(CharacterSelectProcessor), Config.CharacterSelectThreads, true, true, (s, e) => (s as CharacterSelectProcessor).CharacterSelectionComplete += (s1, c) => c.SetMessageProcessor(ProcessorPool.GetProcessor("CommandProcessor", c)));
+            ProcessorPool.SetupProcessorPool("CommandProcessor", typeof(CommandProcessor), Config.CommandProcesseorThreads, true, true, (s, e) => (s as CommandProcessor).CharacterExit += (s1, c) => c.SetMessageProcessor(ProcessorPool.GetProcessor("ExitProcessor", c)));
 
             // plugins
             PlugInLoader.LoadPluginsForAssembly(System.Reflection.Assembly.GetExecutingAssembly()); // this program

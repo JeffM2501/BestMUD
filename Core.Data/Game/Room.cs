@@ -21,6 +21,8 @@ namespace Core.Data.Game
         }
 
         public int UID = int.MinValue;
+        public int ZoneID = int.MinValue;
+
         public KeyValueList Attributes = new KeyValueList();
         public string Name = string.Empty;
 
@@ -32,6 +34,8 @@ namespace Core.Data.Game
     {
         public int ID = int.MinValue;
         public string Name = string.Empty;
+        public KeyValueList Attributes = new KeyValueList();
+
         public List<Room> Rooms = new List<Room>();
     }
 }

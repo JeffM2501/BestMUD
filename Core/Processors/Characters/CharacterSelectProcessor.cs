@@ -109,6 +109,7 @@ namespace Core.Processors.Characters
                             LogCache.Log(LogCache.BasicLog, "User Joining as:(" + user.UserID.ToString() + ")" + user.ActiveCharacter.UID.ToString() + ":" + user.ActiveCharacter.Name);
 
                             SendUserFileMessage(user, "character/select_character_join_as.data", "<!CHAR_NAME>", user.ActiveCharacter.Name);
+                            Scripting.Register.CallOnCharacterJoin(user);
                             CharacterSelectionComplete?.Invoke(this, user);
                         }
                     }

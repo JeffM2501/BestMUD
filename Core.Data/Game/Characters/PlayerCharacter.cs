@@ -38,6 +38,11 @@ namespace Core.Data.Game.Characters
         public int RaceID = int.MinValue;
         public int ClassID = int.MinValue;
 
+        public int CurrentRoom = -1;
+        public int LastExit = -1;
+
+        public List<Tuple<int, int>> RoomHistory = new List<Tuple<int, int>>();
+
         public AttributeList Attributes = new AttributeList();
         public List<string> Equipment = new List<string>();
         public List<string> Inventory = new List<string>();

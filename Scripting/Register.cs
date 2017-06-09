@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Networking;
 using Scripting.API.Handlers;
 
 namespace Scripting
@@ -11,6 +11,13 @@ namespace Scripting
     public static class Register
     {
         internal static Dictionary<string, string> RegisteredFunctionNames = new Dictionary<string, string>();
+
+        public static event EventHandler<Connection> OnCharacterJoin;
+
+        public static void CallOnCharacterJoin(Connection user)
+        {
+            OnCharacterJoin?.Invoke(user, user);
+        }
 
         internal static void Clear()
         {

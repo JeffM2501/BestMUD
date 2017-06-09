@@ -23,8 +23,10 @@ namespace Core.Config
         public int LandingThreads = 1;
         public int CharacterSelectThreads = 2;
         public int CharacterCreateThreads = 1;
+        public int CommandProcesseorThreads = 3;
 
-        public int ZoneThreads = 10;
+        public int MaxZonePlayers = 100;
+
         public int MobThreads = 3;
 
         public static ServerConfig Load(string path)

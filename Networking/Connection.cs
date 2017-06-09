@@ -10,7 +10,7 @@ namespace Networking
 {
     public class Connection : EventArgs
     {
-        public static Connection Empty = new Connection(null);
+        public static Connection None = new Connection(null);
 
         public TcpClient Socket = null;
         public NetworkStream DataStream = null;

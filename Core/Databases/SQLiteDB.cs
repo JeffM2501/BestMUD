@@ -13,6 +13,9 @@ namespace Core.Databases
         {
             DBFile = new FileInfo(connectString);
 
+            if (!DBFile.Directory.Exists)
+                DBFile.Directory.Create();
+
             if (!DBFile.Exists)
             {
                 SQLiteConnection.CreateFile(DBFile.FullName);

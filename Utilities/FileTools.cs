@@ -8,6 +8,8 @@ namespace Utilities
 {
     public static class FileTools
     {
+        public static readonly bool ForceCreate = true;
+
         private static Dictionary<string, string> StaticFileCache = new Dictionary<string, string>();
 
         public static string GetFileContents(DirectoryInfo root, string path, bool useCache)
@@ -38,8 +40,17 @@ namespace Utilities
         {
             if (!file.Exists)
             {
-                LogCache.Log(LogCache.BasicLog, "Requested File not found: " + file.Name);
-                return null;
+                if (ForceCreate)
+                {
+                    if (!file.Directory.Exists)
+                        file.Directory.Create();
+                    SetFileContents(file, string.Empty);
+                }
+                else
+                {
+                    LogCache.Log(LogCache.BasicLog, "Requested File not found: " + file.Name);
+                    return null;
+                }
             }
 
             if (useCache && StaticFileCache.ContainsKey(file.FullName))
@@ -57,6 +68,9 @@ namespace Utilities
 
         public static void SetFileContents(FileInfo file, string data)
         {
+            if (!file.Directory.Exists)
+                file.Directory.Create();
+
             if (file.Exists)
                 file.Delete();
 

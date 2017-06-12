@@ -84,6 +84,25 @@ namespace Core.Databases.GameData
             return l;
         }
 
+        public List<int> GetZoneRoomsIndexList(int zoneID)
+        {
+            List<int> l = new List<int>();
+
+            string sql = "SELECT roomID FROM rooms WHERE zoneID=@zID;";
+            SQLiteCommand command = new SQLiteCommand(sql, DB);
+            command.Parameters.Add(new SQLiteParameter("@zID", zoneID));
+
+
+            var results = command.ExecuteReader();
+            if (results.HasRows)
+            {
+                while (results.Read())
+                    l.Add(results.GetInt32(0));
+            }
+
+            return l;
+        }
+
         public List<int> RoomIndexesWithAttribute(string attribute)
         {
             List<int> l = new List<int>();
@@ -102,6 +121,24 @@ namespace Core.Databases.GameData
             return l;
         }
 
+        protected Zone ReadZoneData(int zoneID)
+        {
+            Zone z = new Zone();
+            z.ID = zoneID;
+            string sql = "SELECT name, attributes FROM zones WHERE zoneID=@zID;";
+            SQLiteCommand command = new SQLiteCommand(sql, DB);
+            command.Parameters.Add(new SQLiteParameter("@zID", zoneID));
+
+            var results = command.ExecuteReader();
+            if (results.HasRows && results.Read())
+            {
+                z.Name = results.GetFieldString(0);
+                z.Attributes = KeyValueList.DeserlizeFromString(results.GetFieldString(1));
+            }
+
+            return z;
+        }
+
         public List<Zone> GetAllZones()
         {
             Dictionary<int, Zone> zones = new Dictionary<int, Zone>();
@@ -112,27 +149,25 @@ namespace Core.Databases.GameData
                 ReadRoomData(id, r);
 
                 if (!zones.ContainsKey(id))
-                {
-                    Zone z = new Zone();
-                    z.ID = r.ZoneID;
-                    string sql = "SELECT name, attributes FROM zones WHERE zoneID=@zID;";
-                    SQLiteCommand command = new SQLiteCommand(sql, DB);
-                    command.Parameters.Add(new SQLiteParameter("@zID", z.ID));
-
-                    var results = command.ExecuteReader();
-                    if (results.HasRows && results.Read())
-                    {
-                        z.Name = results.GetFieldString(0);
-                        z.Attributes = KeyValueList.DeserlizeFromString(results.GetFieldString(1));
-                    }
-
-                    zones.Add(z.ID, z);
-                }
+                    zones.Add(id, ReadZoneData(id));
 
                 zones[r.ZoneID].Rooms.Add(r);
             }
 
             return new List<Zone>(zones.Values.ToArray());
+        }
+
+        public Zone GetZone(int zoneID)
+        {
+            Zone zone = ReadZoneData(zoneID);
+            foreach (int id in GetZoneRoomsIndexList(zoneID))
+            {
+                Room r = new Room();
+                if (ReadRoomData(id, r))
+                    zone.Rooms.Add(r);
+            }
+
+            return zone;
         }
 
         public Room GetRoom(int id )

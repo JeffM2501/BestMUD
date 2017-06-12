@@ -48,6 +48,7 @@
     <Compile Include="Game\Classes\ClassInfo.cs" />
     <Compile Include="Game\Races\RaceInfo.cs" />
     <Compile Include="Game\Room.cs" />
+    <Compile Include="Game\World\ZoneInstance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -51,6 +51,7 @@
     <Compile Include="IMessageProcessor.cs" />
     <Compile Include="IProtocol.cs" />
     <Compile Include="ListeningManager.cs" />
+    <Compile Include="MsgUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

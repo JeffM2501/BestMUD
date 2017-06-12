@@ -160,7 +160,7 @@ namespace Core.Databases.PlayerData
                 {
                     command.ExecuteNonQuery();
                 }
-                catch(Exception ex)
+                catch(Exception /*ex*/)
                 {
 
                 }

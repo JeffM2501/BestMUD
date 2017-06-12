@@ -5,19 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Networking;
 using Scripting.API.Handlers;
+using Core.Data.Game.World;
 
 namespace Scripting
 {
     public static class Register
     {
         internal static Dictionary<string, string> RegisteredFunctionNames = new Dictionary<string, string>();
-
-        public static event EventHandler<Connection> OnCharacterJoin;
-
-        public static void CallOnCharacterJoin(Connection user)
-        {
-            OnCharacterJoin?.Invoke(user, user);
-        }
 
         internal static void Clear()
         {
@@ -37,6 +31,19 @@ namespace Scripting
         public static void SetCharacterCreator(ICharacterCreator handler)
         {
             CharacterHandler = handler;
+        }
+
+        public static event EventHandler<Connection> OnCharacterJoin;
+        public static void CallOnCharacterJoin(Connection user)
+        {
+            OnCharacterJoin?.Invoke(user, user);
+        }
+
+        public static event EventHandler<ZoneInstance> OnZoneStartup;
+
+        public static void CallOnZoneStartup(ZoneInstance zone)
+        {
+            OnZoneStartup?.Invoke(zone, zone);
         }
     }
 }

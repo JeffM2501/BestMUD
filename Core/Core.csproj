@@ -69,12 +69,12 @@
     <Compile Include="DefaultRules\DefaultRuleset.cs" />
     <Compile Include="Processors\Characters\CharacterCreateProcessor.cs" />
     <Compile Include="Processors\Characters\CharacterSelectProcessor.cs" />
-    <Compile Include="Data\Paths.cs" />
     <Compile Include="Processors\LandingProcessor.cs" />
     <Compile Include="Processors\PooledProcessor.cs" />
     <Compile Include="Processors\World\CommandProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="World\ZoneInstance.cs" />
+    <Compile Include="World\ZoneFactory.cs" />
+    <Compile Include="World\RuntimeZoneInstance.cs" />
     <Compile Include="World\ZoneInstanceManager.cs" />
   </ItemGroup>
   <ItemGroup>

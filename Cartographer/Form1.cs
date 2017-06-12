@@ -24,7 +24,7 @@ namespace Cartographer
             if (dataPath != string.Empty)
             {
 
-                Core.Data.Paths.DataPath = new DirectoryInfo(dataPath);
+                Utilities.Paths.DataPath = new DirectoryInfo(dataPath);
 
                 DataDir = new DirectoryInfo(dataPath);
 
@@ -123,7 +123,7 @@ namespace Cartographer
         {
             e.Graphics.Clear(Color.White);
 
-            foreach (var room in )
+         //   foreach (var room in )
         }
     }
 }

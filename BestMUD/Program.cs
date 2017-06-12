@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-using Core.Data;
 using Core.Processors;
 using Core.Databases.Authentication;
 using Core.Databases.PlayerData;
@@ -53,7 +52,7 @@ namespace BestMUD
                 return;
             }
 
-            Core.Data.Paths.DataPath = new DirectoryInfo(dataPath);
+            Utilities.Paths.DataPath = new DirectoryInfo(dataPath);
 
             string dbPath = Path.Combine(dataPath, "databases");
             if (Config.DatabaseDir != string.Empty)

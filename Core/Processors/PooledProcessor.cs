@@ -132,32 +132,16 @@ namespace Core.Processors
 
         protected virtual void SendUserFileMessage(Connection user, string path)
         {
-            string data = FileTools.GetFileContents(Paths.DataPath, path, true);
-            if (data == null)
-                data = path;
-            user.SendOutboundMessage(data);
+            MsgUtils.SendUserFileMessage(user, path);
         }
 
         protected virtual void SendUserFileMessage(Connection user, string path, Dictionary<string,string> repacements)
         {
-            string data = FileTools.GetFileContents(Paths.DataPath, path, true);
-            if (data == null)
-                data = path;
-
-            foreach (var r in repacements)
-                data = data.Replace(r.Key, r.Value);
-
-            user.SendOutboundMessage(data);
+            MsgUtils.SendUserFileMessage(user, path, repacements);
         }
         protected virtual void SendUserFileMessage(Connection user, string path, string key, string value)
         {
-            string data = FileTools.GetFileContents(Paths.DataPath, path, true);
-            if (data == null)
-                data = path;
-
-            data = data.Replace(key, value);
-
-            user.SendOutboundMessage(data);
+            MsgUtils.SendUserFileMessage(user, path, key, value);
         }
     }
 

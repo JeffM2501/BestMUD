@@ -15,8 +15,6 @@ namespace Core.Databases.GameData
     {
         public static ZoneDB Instance = new ZoneDB();
 
-        public Dictionary<int, Room> RoomCache = new Dictionary<int, Room>();
-
         protected override void ValidateDatabase()
         {
             base.ValidateDatabase();
@@ -151,7 +149,7 @@ namespace Core.Databases.GameData
                 if (!zones.ContainsKey(id))
                     zones.Add(id, ReadZoneData(id));
 
-                zones[r.ZoneID].Rooms.Add(r);
+                zones[r.ZoneID].Rooms.Add(id, r);
             }
 
             return new List<Zone>(zones.Values.ToArray());
@@ -164,7 +162,7 @@ namespace Core.Databases.GameData
             {
                 Room r = new Room();
                 if (ReadRoomData(id, r))
-                    zone.Rooms.Add(r);
+                    zone.Rooms.Add(id,r);
             }
 
             return zone;
@@ -172,21 +170,10 @@ namespace Core.Databases.GameData
 
         public Room GetRoom(int id )
         {
-            if (RoomCache.ContainsKey(id))
-                return RoomCache[id];
-
             Room r = new Room();
             ReadRoomData(id, r);
-            RoomCache.Add(id, r);
+ 
             return r;
-        }
-
-        public void RefreshRoom(int id)
-        {
-            if (!RoomCache.ContainsKey(id))
-                return;
-
-            ReadRoomData(id, RoomCache[id]);
         }
 
         public int AddRoom(Room room)
@@ -236,7 +223,7 @@ namespace Core.Databases.GameData
             command.Parameters.Add(new SQLiteParameter("@id", zone.ID));
             command.ExecuteNonQuery();
 
-            foreach (var r in zone.Rooms)
+            foreach (var r in zone.Rooms.Values)
             {
                 r.ZoneID = zone.ID;
                 WriteRoomData(r);

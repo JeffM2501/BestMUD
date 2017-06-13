@@ -19,9 +19,9 @@ namespace Core.World
 
         protected DateTime LastConnectionTime = DateTime.MinValue;
 
-        public bool Delitable() { lock (ConnectedPlayers) return !IsPrimary && IsEmpty() && (DateTime.Now - LastConnectionTime).Seconds > 30; }
+        public bool Delitable() { lock (ConnectedPlayers) return IsEmpty() && (DateTime.Now - LastConnectionTime).Seconds > 30; }
 
-        public override bool Full() { lock (ConnectedCharacters) return (PendingPlayers.Count + ConnectedCharacters.Count) >= MaxPlayers; }
+        public override bool Full() { lock (ConnectedCharacters) return Worker == null ? true: (PendingPlayers.Count + ConnectedCharacters.Count) >= MaxPlayers; }
         public override bool IsEmpty() { lock (ConnectedCharacters) return ( PendingPlayers.Count + ConnectedCharacters.Count) == 0; }
 
         protected Thread Worker = null;
@@ -97,6 +97,9 @@ namespace Core.World
             string msg = user.ActiveCharacter.Name + " has entered";
 
             SendToRoom(msg, user, user.ActiveCharacter.CurrentRoom);
+
+            msg = "You have entered " + HostedZone.Rooms[user.ActiveCharacter.CurrentRoom].Description;
+            user.SendOutboundMessage(msg);
         }
 
         protected virtual void ProcessRemove(int room, PlayerCharacter pc)

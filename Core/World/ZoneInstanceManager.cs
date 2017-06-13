@@ -1,4 +1,5 @@
-﻿using Networking;
+﻿using Core.Databases.GameData;
+using Networking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Core.World
 {
-    public class ZoneInstanceManager
+    public static class ZoneInstanceManager
     {
-        public Dictionary<int, List<RuntimeZoneInstance>> ActiveZones = new Dictionary<int, List<RuntimeZoneInstance>>();
-        public RuntimeZoneInstance GetInstance(Connection user, int zoneID, int roomID)
+        private static Dictionary<int, List<RuntimeZoneInstance>> ActiveZones = new Dictionary<int, List<RuntimeZoneInstance>>();
+        public static RuntimeZoneInstance GetInstance(Connection user, int zoneID, int roomID)
         {
             List<RuntimeZoneInstance> ZoneList = null;
             lock(ActiveZones)
@@ -24,7 +25,7 @@ namespace Core.World
             RuntimeZoneInstance zone = null;
             lock (ZoneList)
             {
-                zone = ZoneList.Find(x => !x.IsEmpty());
+                zone = ZoneList.Find(x => !x.Full());
                 if (zone == null)
                 {
                     // gotta add a new one
@@ -39,12 +40,57 @@ namespace Core.World
             return zone;
         }
 
-        public void Update()
+        public static void SetUserToZone(Connection con, int zoneID, int roomID)
         {
+            if (con.CurrentZoneProcessor as RuntimeZoneInstance != null)
+                (con.CurrentZoneProcessor as RuntimeZoneInstance).RemoveUser(con);
 
+            con.CurrentZoneProcessor = null;
+            if (zoneID >= 0)
+                con.CurrentZoneProcessor = GetInstance(con, zoneID, roomID);
         }
 
-        public void KillAll()
+        public static void Update()
+        {
+            List<int> zoneKeys = null;
+            lock (ActiveZones)
+                zoneKeys = new List<int>(ActiveZones.Keys);
+
+            foreach (var key in zoneKeys)
+            {
+                List<RuntimeZoneInstance> zoneList = null;
+                lock (ActiveZones)
+                    zoneList = ActiveZones[key];
+
+                List<RuntimeZoneInstance> deadZones = new List<RuntimeZoneInstance>();
+                lock (zoneList)
+                {
+                    foreach(var zone in zoneList)
+                    {
+                        if (zone.Delitable())
+                        {
+                            zone.Kill();
+                            deadZones.Add(zone);
+                        }
+                    }
+
+                    zoneList.RemoveAll(x => deadZones.Contains(x));
+                }
+
+                foreach(var zone in deadZones)
+                {
+                    if (zone.Primary)
+                    {
+                        foreach (var r in zone.HostedZone.Rooms.Values)
+                        {
+                            // write room contents before flush...
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void KillAll()
         {
             lock (ActiveZones)
             {

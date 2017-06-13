@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Data.Game.Characters;
+using Core.Data.Game.World;
 
 namespace Networking
 {
@@ -28,6 +29,8 @@ namespace Networking
         public List<string> AccessFlags = new List<string>();
 
         public PlayerCharacter ActiveCharacter = null;
+
+        public ZoneInstance CurrentZoneProcessor = null;
 
         protected readonly bool DebugEcho = false;
 

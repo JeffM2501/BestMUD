@@ -36,6 +36,6 @@ namespace Core.Data.Game
         public string Name = string.Empty;
         public KeyValueList Attributes = new KeyValueList();
 
-        public List<Room> Rooms = new List<Room>();
+        public Dictionary<int, Room> Rooms = new Dictionary<int, Room>();
     }
 }

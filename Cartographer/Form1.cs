@@ -75,7 +75,7 @@ namespace Cartographer
                 group.Tag = z;
                 RoomList.Groups.Add(group);
 
-                foreach (var r in z.Rooms)
+                foreach (var r in z.Rooms.Values)
                 {
                     ListViewItem item = new ListViewItem(r.UID + "_" + r.Name);
                     item.Group = group;

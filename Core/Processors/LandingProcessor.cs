@@ -46,23 +46,23 @@ namespace Core.Processors
             DestoryOnEmpty = true;
         }
 
-        public override void ProcessorAttach(Connection con)
+        public override void ProcessorAttach(Connection user)
         {
-            base.ProcessorAttach(con);
+            base.ProcessorAttach(user);
 
-            GetConStateData<LandingStateData>(con);
+            GetConStateData<LandingStateData>(user);
 
-            con.UserID = -1;
-            con.AccessFlags.Clear();
+            user.UserID = -1;
+            user.AccessFlags.Clear();
 
-            if (con.SentHeader)
+            if (user.SentHeader)
             {
-                SendUserFileMessage(con, "login/logon.data");
-                con.SentHeader = true;
+                SendUserFileMessage(user, "login/logon.data");
+                user.SentHeader = true;
             }
 
             // send them the hello
-            SendUserFileMessage(con, "login/get_name.data");
+            SendUserFileMessage(user, "login/get_name.data");
         }
 
         protected override bool ProcessUserMessage(Connection user, string msg)

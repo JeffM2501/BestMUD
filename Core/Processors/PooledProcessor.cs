@@ -20,21 +20,21 @@ namespace Core.Processors
 
         public event EventHandler ProcessSetup = null;
 
-        protected T GetConStateData<T>(Connection con) where T:class
+        protected T GetConStateData<T>(Connection user) where T:class
         {
-            T d = con.GetMesssageProcessorTag<T>();
+            T d = user.GetMesssageProcessorTag<T>();
             if (d == null)
             {
                 string name = typeof(T).Name;
 
-                d = con.GetMesssageProcessorTag(name) as T;
+                d = user.GetMesssageProcessorTag(name) as T;
                 if (d == null)
                 {
                     d = Activator.CreateInstance<T>();
-                    con.SetMessageProcessorTag(name, d);
+                    user.SetMessageProcessorTag(name, d);
                 }
                 else
-                    con.SetMessageProcessorTag(name);
+                    user.SetMessageProcessorTag(name);
             }
 
             return d;
@@ -66,29 +66,29 @@ namespace Core.Processors
                 return ActiveConnections.Count >= MaxConnections;
         }
 
-        public virtual void ProcessAccept(Connection con)
+        public virtual void ProcessAccept(Connection user)
         {
         }
 
-        public virtual void ProcessDisconnect(Connection con)
+        public virtual void ProcessDisconnect(Connection user)
         {
-            ProcessorDetatch(con);
+            ProcessorDetatch(user);
         }
 
-        public virtual void ProcessInbound(string message, Connection con)
+        public virtual void ProcessInbound(string message, Connection user)
         {
         }
 
-        public virtual void ProcessorAttach(Connection con)
+        public virtual void ProcessorAttach(Connection user)
         {
             lock (ActiveConnections)
-                ActiveConnections.Add(con);
+                ActiveConnections.Add(user);
         }
 
-        public virtual void ProcessorDetatch(Connection con)
+        public virtual void ProcessorDetatch(Connection user)
         {
             lock (ActiveConnections)
-                ActiveConnections.Remove(con);
+                ActiveConnections.Remove(user);
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace Core.Processors
             }
         }
 
-        public static IMessageProcessor GetProcessor(string name, Connection con)
+        public static IMessageProcessor GetProcessor(string name, Connection user)
         {
             lock(ProcessorPools)
             {

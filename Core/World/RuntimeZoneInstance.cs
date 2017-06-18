@@ -159,5 +159,10 @@ namespace Core.World
                 }
             }
         }
+
+        public override void PlayerSay(Connection con, string text)
+        {
+            SendToRoom(con.ActiveCharacter.Name + " said \"" + text + "\"",con, con.ActiveCharacter.CurrentRoom);
+        }
     }
 }

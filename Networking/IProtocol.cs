@@ -8,10 +8,10 @@ namespace Networking
 {
     public interface IProtocol
     {
-        bool TranslateInbound(byte[] buffer, Connection con);
-        bool TranslateOutbound(string text, StringBuilder buffer, Connection con);
+        bool TranslateInbound(byte[] buffer, Connection user);
+        bool TranslateOutbound(string text, StringBuilder buffer, Connection user);
 
-        void AddConnection(Connection con);
-        void RemoveConnection(Connection con);
+        void AddConnection(Connection user);
+        void RemoveConnection(Connection user);
     }
 }

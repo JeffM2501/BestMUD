@@ -23,7 +23,10 @@ namespace Core.Data.Game.World
 
         public ZoneInstance (Zone z)
         {
-            HostedZone = z;
+            HostedZone = z;z
         }
+
+        // virtualized methods for doing actions
+        public abstract void PlayerSay(Connection con, string text);
     }
 }

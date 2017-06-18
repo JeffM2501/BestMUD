@@ -40,14 +40,14 @@ namespace Core.World
             return zone;
         }
 
-        public static void SetUserToZone(Connection con, int zoneID, int roomID)
+        public static void SetUserToZone(Connection user, int zoneID, int roomID)
         {
-            if (con.CurrentZoneProcessor as RuntimeZoneInstance != null)
-                (con.CurrentZoneProcessor as RuntimeZoneInstance).RemoveUser(con);
+            if (user.CurrentZoneProcessor as RuntimeZoneInstance != null)
+                (user.CurrentZoneProcessor as RuntimeZoneInstance).RemoveUser(user);
 
-            con.CurrentZoneProcessor = null;
+            user.CurrentZoneProcessor = null;
             if (zoneID >= 0)
-                con.CurrentZoneProcessor = GetInstance(con, zoneID, roomID);
+                user.CurrentZoneProcessor = GetInstance(user, zoneID, roomID);
         }
 
         public static void Update()

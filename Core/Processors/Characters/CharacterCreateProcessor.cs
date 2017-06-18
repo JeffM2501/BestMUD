@@ -27,14 +27,14 @@ namespace Core.Processors.Characters
             public int[] ClassIndexes = null;
         }
 
-        public override void ProcessorAttach(Connection con)
+        public override void ProcessorAttach(Connection user)
         {
-            base.ProcessorAttach(con);
+            base.ProcessorAttach(user);
 
-            var data = GetConStateData<CharacterCreateStateData>(con);
+            var data = GetConStateData<CharacterCreateStateData>(user);
 
             // send out the create name message
-            SendUserFileMessage(con, "character/create/character_name.data");
+            SendUserFileMessage(user, "character/create/character_name.data");
         }
 
         protected void ShowRaceList(Connection user)

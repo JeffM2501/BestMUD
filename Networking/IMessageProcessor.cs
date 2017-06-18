@@ -8,12 +8,12 @@ namespace Networking
 {
     public interface IMessageProcessor
     {
-        void ProcessAccept(Connection con);
-        void ProcessDisconnect(Connection con);
+        void ProcessAccept(Connection user);
+        void ProcessDisconnect(Connection user);
 
-        void ProcessInbound(string message, Connection con);
+        void ProcessInbound(string message, Connection user);
 
-        void ProcessorAttach(Connection con);
-        void ProcessorDetatch(Connection con);
+        void ProcessorAttach(Connection user);
+        void ProcessorDetatch(Connection user);
     }
 }

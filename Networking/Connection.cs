@@ -185,5 +185,11 @@ namespace Networking
         {
             Disconnected?.Invoke(this, this);
         }
+
+        public bool HasAccessFlag(string flag)
+        {
+            lock (AccessFlags)
+                return AccessFlags.Find(x => x.ToLower() == flag.ToLower()) != string.Empty;
+        }
     }
 }

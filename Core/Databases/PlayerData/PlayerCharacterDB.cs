@@ -83,7 +83,7 @@ namespace Core.Databases.PlayerData
 
                 if (getQuestData && DB != null)
                 {
-                    string sql = "SELECT * FROM questData WHERE characterID=@cid;";
+                    string sql = "SELECT * FROM questData WHERE chracterID=@cid;";
                     SQLiteCommand command = new SQLiteCommand(sql, DB);
                     command.Parameters.Add(new SQLiteParameter("@cid", pc.UID));
 

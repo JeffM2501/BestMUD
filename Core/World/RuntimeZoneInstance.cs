@@ -15,16 +15,39 @@ namespace Core.World
         protected List<Connection> PendingPlayers = new List<Connection>();
         protected List<Tuple<int,PlayerCharacter>> PendingRemovals = new List<Tuple<int, PlayerCharacter>>();
 
-        public List<Connection> ConnectedPlayers = new List<Connection>();
+        public Dictionary<int,Connection> ConnectedPlayers = new Dictionary<int,Connection>();
 
         protected DateTime LastConnectionTime = DateTime.MinValue;
 
-        public bool Delitable() { lock (ConnectedPlayers) return IsEmpty() && (DateTime.Now - LastConnectionTime).Seconds > 30; }
+        protected bool GotAtLeastOne = false;
+
+        public bool Delitable()
+        {
+            lock (ConnectedPlayers)
+            {
+                int pendCount = 0;
+                lock (PendingPlayers)
+                    pendCount = PendingPlayers.Count;
+
+                return GotAtLeastOne && pendCount == 0 && IsEmpty() && (DateTime.Now - LastConnectionTime).Seconds > 30;
+            }
+                
+        }
 
         public override bool Full() { lock (ConnectedCharacters) return Worker == null ? true: (PendingPlayers.Count + ConnectedCharacters.Count) >= MaxPlayers; }
         public override bool IsEmpty() { lock (ConnectedCharacters) return ( PendingPlayers.Count + ConnectedCharacters.Count) == 0; }
 
         protected Thread Worker = null;
+
+        protected Connection GetUser(int id)
+        {
+            lock (ConnectedPlayers)
+            {
+                if (ConnectedPlayers.ContainsKey(id))
+                    return ConnectedPlayers[id];
+            }
+            return null;
+        }
 
         public void Kill()
         {
@@ -46,7 +69,16 @@ namespace Core.World
             HostedZone = z;
         }
 
-        public void Execute()
+        public void Run()
+        {
+            if (Worker != null)
+                Worker.Abort();
+
+            Worker = new Thread(new ThreadStart(Execute));
+            Worker.Start();
+        }
+
+        protected void Execute()
         {
             Startup();
 
@@ -89,7 +121,10 @@ namespace Core.World
         protected virtual void ProcessAdd(Connection user)
         {
             lock (ConnectedPlayers)
-                ConnectedPlayers.Add(user);
+            {
+                GotAtLeastOne = true;
+                ConnectedPlayers.Add(user.UserID, user);
+            }
 
             lock (ConnectedCharacters)
                 ConnectedCharacters.Add(user.ActiveCharacter);
@@ -125,7 +160,7 @@ namespace Core.World
             lock (ConnectedCharacters)
                 ConnectedCharacters.Remove(user.ActiveCharacter);
             lock (ConnectedPlayers)
-                ConnectedPlayers.Remove(user);
+                ConnectedPlayers.Remove(user.UserID);
 
             // delay any removals until the update thread.
             lock (PendingRemovals)
@@ -136,7 +171,7 @@ namespace Core.World
         {
             lock (ConnectedPlayers)
             {
-                foreach(var c in ConnectedPlayers)
+                foreach(var c in ConnectedPlayers.Values)
                 {
                     if (c == except || c.ActiveCharacter.CurrentRoom != room)
                         continue;
@@ -150,7 +185,7 @@ namespace Core.World
         {
             lock (ConnectedPlayers)
             {
-                foreach (var c in ConnectedPlayers)
+                foreach (var c in ConnectedPlayers.Values)
                 {
                     if (c == except)
                         continue;
@@ -160,9 +195,40 @@ namespace Core.World
             }
         }
 
-        public override void PlayerSay(Connection con, string text)
+        public override void PlayerSay(int userID, string text)
         {
+            var con = GetUser(userID);
+            if (con == null)
+                return;
+
             SendToRoom(con.ActiveCharacter.Name + " said \"" + text + "\"",con, con.ActiveCharacter.CurrentRoom);
+        }
+
+        public override void PlayerWho(int userID)
+        {
+            var con = GetUser(userID);
+            if (con == null)
+                return;
+
+            // TODO, cache this list
+            List<string> names = new List<string>();
+            bool isAdmin = con.HasAccessFlag("admin");
+
+            lock (ConnectedPlayers)
+            {
+                foreach ( var u in ConnectedPlayers.Values)
+                {
+                    string n = "\t" + u.ActiveCharacter.Name;
+                    if (isAdmin)
+                        n += " " + u.UserID.ToString();
+
+                    names.Add(n);
+                }
+            }
+
+            con.SendOutboundMessage("In zone:");
+            foreach (var u in names)
+                con.SendOutboundMessage(u);
         }
     }
 }

@@ -25,13 +25,12 @@ namespace Core.Processors.World
             CommandProcessors.Add("say", Say);
         }
 
-        public override void ProcessAccept(Connection user)
+        public override void ProcessorAttach(Connection user)
         {
-            base.ProcessAccept(user);
+            base.ProcessorAttach(user);
 
             int zone = ZoneDB.Instance.GetRoomZone(user.ActiveCharacter.CurrentRoom);
             ZoneInstanceManager.SetUserToZone(user, zone, user.ActiveCharacter.CurrentRoom);
-
         }
 
         protected override bool ProcessUserMessage(Connection user, string msg)
@@ -68,7 +67,7 @@ namespace Core.Processors.World
         protected virtual void Say(Connection user, string cmd, string args)
         {
             if (user.CurrentZoneProcessor != null)
-                user.CurrentZoneProcessor.PlayerSay(user, args);
+                user.CurrentZoneProcessor.PlayerSay(user.UserID, args);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Core.World
         public static RuntimeZoneInstance SpawnZone(int zoneID)
         {
             RuntimeZoneInstance inst = new RuntimeZoneInstance(ZoneDB.Instance.GetZone(zoneID));
-            inst.Execute();
+            inst.Run();
             return inst;
         }
     }

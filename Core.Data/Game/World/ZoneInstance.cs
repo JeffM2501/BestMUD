@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Data.Common;
 
 namespace Core.Data.Game.World
 {
@@ -29,5 +30,7 @@ namespace Core.Data.Game.World
         // virtualized methods for doing actions
         public virtual void PlayerSay(int userID, string text) { }
         public virtual void PlayerWho(int userID) { }
+        public virtual void PlayerLookEnviron(int userID) { }
+        public virtual void PlayerMove(int userID, Directions dir) { }
     }
 }

@@ -181,6 +181,8 @@ namespace Core.Processors
 
         public void Work()
         {
+            Processor.Setup();
+
             while(true)
             {
                 bool wantToDie = false;
@@ -242,7 +244,7 @@ namespace Core.Processors
             lock (pool.Processors)
                 pool.Processors.Add(proc);
 
-            pool.SetupEvent?.Invoke(proc, EventArgs.Empty);
+        //    pool.SetupEvent?.Invoke(proc, EventArgs.Empty);
 
             if (pool.ThreadUpdates)
             {
@@ -255,6 +257,8 @@ namespace Core.Processors
                 lock (ProcessingThreads)
                     ProcessingThreads.Add(tp);
             }
+            else
+                proc.Setup();
 
             return proc;
         }

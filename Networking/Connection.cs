@@ -186,6 +186,13 @@ namespace Networking
             Disconnected?.Invoke(this, this);
         }
 
+        public virtual void Disconnect()
+        {
+            Socket.Close();
+            Socket.Dispose();
+            Socket = null;
+        }
+
         public bool HasAccessFlag(string flag)
         {
             lock (AccessFlags)

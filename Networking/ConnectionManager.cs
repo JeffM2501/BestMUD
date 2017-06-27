@@ -94,9 +94,11 @@ namespace Networking
 
                 foreach(var con in connections)
                 {
-                    if (!con.Socket.Connected || con.MessageProcessor == null) // it's dead or noody wants them
+                    if (con.Socket == null || !con.Socket.Connected || con.MessageProcessor == null) // it's dead or noody wants them
                     {
-                        con.Socket.Close();
+                        if (con.Socket != null) 
+                            con.Socket.Close();
+
                         ProtcolProcessor.RemoveConnection(con);
                         if (con.MessageProcessor != null)
                             con.MessageProcessor.ProcessDisconnect(con);

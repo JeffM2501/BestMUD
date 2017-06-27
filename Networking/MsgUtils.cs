@@ -11,13 +11,32 @@ namespace Networking
     {
         public static void SendUserFileMessage(Connection user, string path)
         {
-            string data = FileTools.GetFileContents(Paths.DataPath, path, true);
-            if (data == null)
-                data = path;
-            user.SendOutboundMessage(data);
+            user.SendOutboundMessage(GetFileMessage(path));
         }
 
         public static void SendUserFileMessage(Connection user, string path, Dictionary<string, string> repacements)
+        {
+            user.SendOutboundMessage(GetFileMessage(path,repacements));
+        }
+        public static void SendUserFileMessage(Connection user, string path, string key, string value)
+        {
+            user.SendOutboundMessage(GetFileMessage(path,key,value));
+        }
+
+        public static void SendUserFileMessage(Connection user, string path, string key1, string value1, string key2, string value2)
+        {
+            user.SendOutboundMessage(GetFileMessage(path, key1, value1,key2,value2));
+        }
+
+        public static string GetFileMessage(string path)
+        {
+            string data = FileTools.GetFileContents(Paths.DataPath, path, true);
+            if (data == null)
+                data = path;
+            return data;
+        }
+
+        public static string GetFileMessage(string path, Dictionary<string, string> repacements)
         {
             string data = FileTools.GetFileContents(Paths.DataPath, path, true);
             if (data == null)
@@ -26,9 +45,9 @@ namespace Networking
             foreach (var r in repacements)
                 data = data.Replace(r.Key, r.Value);
 
-            user.SendOutboundMessage(data);
+            return data;
         }
-        public static void SendUserFileMessage(Connection user, string path, string key, string value)
+        public static string GetFileMessage(string path, string key, string value)
         {
             string data = FileTools.GetFileContents(Paths.DataPath, path, true);
             if (data == null)
@@ -36,7 +55,19 @@ namespace Networking
 
             data = data.Replace(key, value);
 
-            user.SendOutboundMessage(data);
+            return data;
+        }
+
+        public static string GetFileMessage(string path, string key1, string value1, string key2, string value2)
+        {
+            string data = FileTools.GetFileContents(Paths.DataPath, path, true);
+            if (data == null)
+                data = path;
+
+            data = data.Replace(key1, value1);
+            data = data.Replace(key2, value2);
+
+            return data;
         }
     }
 }

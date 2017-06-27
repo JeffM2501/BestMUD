@@ -74,6 +74,12 @@ namespace Core.Processors.Characters
 
             var data = GetConStateData<CharacterSelectStateData>(user);
 
+            if (msg.ToLowerInvariant() == "exit")
+            {
+                user.Disconnect();
+                return false;
+            }
+
             if (data.CharacterIndexes.Count == 0)
             {
                 SendUserFileMessage(user, "character/no_characters.data");

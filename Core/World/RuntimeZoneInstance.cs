@@ -7,6 +7,7 @@ using Networking;
 using Core.Data.Game.World;
 using Core.Data.Game.Characters;
 using System.Threading;
+using Core.Data.Common;
 
 namespace Core.World
 {
@@ -133,8 +134,7 @@ namespace Core.World
 
             SendToRoom(msg, user, user.ActiveCharacter.CurrentRoom);
 
-            msg = "You have entered " + HostedZone.Rooms[user.ActiveCharacter.CurrentRoom].Description;
-            user.SendOutboundMessage(msg);
+            MsgUtils.SendUserFileMessage(user, "world/room_join_message.data", "<!ROOM_NAME>", HostedZone.Rooms[user.ActiveCharacter.CurrentRoom].Description);
         }
 
         protected virtual void ProcessRemove(int room, PlayerCharacter pc)
@@ -201,7 +201,45 @@ namespace Core.World
             if (con == null)
                 return;
 
-            SendToRoom(con.ActiveCharacter.Name + " said \"" + text + "\"",con, con.ActiveCharacter.CurrentRoom);
+            SendToRoom(MsgUtils.GetFileMessage("world/room_join_message.data", "<!USER_NAME>", con.ActiveCharacter.Name, "<!MESSAGE>", text), con, con.ActiveCharacter.CurrentRoom);
+        }
+
+        public override void PlayerLookEnviron(int userID)
+        {
+            var user = GetUser(userID);
+            if (user == null)
+                return;
+
+            MsgUtils.SendUserFileMessage(user, "world/room_look_message.data", "<!ROOM_NAME>", HostedZone.Rooms[user.ActiveCharacter.CurrentRoom].Description);
+
+            user.SendOutboundMessage("Exits\r\n");
+            foreach (var exit in HostedZone.Rooms[user.ActiveCharacter.CurrentRoom].Exits)
+                user.SendOutboundMessage( exit.Direction.ToString() + " " + exit.Description + "\r\n");
+        }
+
+        public override void PlayerMove(int userID, Directions dir)
+        {
+            var user = GetUser(userID);
+            if (user == null)
+                return;
+
+            Room.Exit exit = null;
+
+            foreach (var e in HostedZone.Rooms[user.ActiveCharacter.CurrentRoom].Exits)
+            {
+                if (e.Direction == dir)
+                {
+                    exit = e;
+                    break;
+                }
+            }
+
+            if (exit == null)
+                MsgUtils.SendUserFileMessage(user, "world/room_invalid_exit_dir.data", "<!DIR_NAME>", dir.ToString());
+            else
+            {
+
+            }
         }
 
         public override void PlayerWho(int userID)
@@ -222,11 +260,13 @@ namespace Core.World
                     if (isAdmin)
                         n += " " + u.UserID.ToString();
 
+                    n += "\r\n";
+
                     names.Add(n);
                 }
             }
 
-            con.SendOutboundMessage("In zone:");
+            MsgUtils.SendUserFileMessage(con, "world/who_header.data");
             foreach (var u in names)
                 con.SendOutboundMessage(u);
         }

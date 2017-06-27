@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Core.Databases.GameData;
 using Networking;
 using Core.World;
+using Core.Databases.PlayerData;
+using Core.Data.Common;
 
 namespace Core.Processors.World
 {
@@ -23,6 +25,17 @@ namespace Core.Processors.World
 
             CommandProcessors.Add("who", Who);
             CommandProcessors.Add("say", Say);
+            CommandProcessors.Add("look", Look);
+            CommandProcessors.Add("exit", Exit);
+
+            CommandProcessors.Add("north", Move);
+            CommandProcessors.Add("n", Move);
+            CommandProcessors.Add("south", Move);
+            CommandProcessors.Add("s", Move);
+            CommandProcessors.Add("east", Move);
+            CommandProcessors.Add("e", Move);
+            CommandProcessors.Add("west", Move);
+            CommandProcessors.Add("w", Move);
         }
 
         public override void ProcessorAttach(Connection user)
@@ -35,7 +48,7 @@ namespace Core.Processors.World
 
         protected override bool ProcessUserMessage(Connection user, string msg)
         {
-            return base.ProcessUserMessage(user, msg);
+            base.ProcessUserMessage(user, msg);
             if (msg == string.Empty)
                 return false;
 
@@ -61,13 +74,84 @@ namespace Core.Processors.World
 
         protected virtual void Who(Connection user, string cmd, string args)
         {
-
+            if (user.CurrentZoneProcessor != null)
+                user.CurrentZoneProcessor.PlayerWho(user.UserID);
         }
 
         protected virtual void Say(Connection user, string cmd, string args)
         {
             if (user.CurrentZoneProcessor != null)
                 user.CurrentZoneProcessor.PlayerSay(user.UserID, args);
+        }
+        protected virtual void Look(Connection user, string cmd, string args)
+        {
+            if (user.CurrentZoneProcessor == null)
+                return;
+
+            if (args == string.Empty)
+                user.CurrentZoneProcessor.PlayerLookEnviron(user.UserID);
+        }
+
+        protected Directions ParseDirection(string word)
+        {
+            if (word == "down" || word == "d")
+                return Directions.Down;
+
+            if (word == "up" || word == "u")
+                return Directions.Up;
+
+            if (word == "north" || word == "n")
+                return Directions.North;
+
+            if (word == "northeast" || word == "ne")
+                return Directions.NorthEast;
+
+            if (word == "east" || word == "e")
+                return Directions.East;
+
+            if (word == "southeast" || word == "se")
+                return Directions.SouthEast;
+
+            if (word == "south" || word == "s")
+                return Directions.South;
+
+            if (word == "southwest" || word == "sw")
+                return Directions.SouthWest;
+
+            if (word == "west" || word == "w")
+                return Directions.West;
+
+            if (word == "northwest" || word == "nw")
+                return Directions.South;
+
+            if (word == "middle" || word == "m")
+                return Directions.South;
+
+            return Directions.Unknown;          
+        }
+
+        protected virtual void Move(Connection user, string cmd, string args)
+        {
+            if (user.CurrentZoneProcessor == null)
+                return;
+
+            v
+
+            if (args == string.Empty)
+                user.CurrentZoneProcessor.PlayerLookEnviron(user.UserID);
+        }
+
+        protected virtual void Exit(Connection user, string cmd, string args)
+        {
+            if (user.CurrentZoneProcessor != null)
+                (user.CurrentZoneProcessor as RuntimeZoneInstance).RemoveUser(user);
+
+            PlayerCharacterDB.Instance.CheckInCharacter(user.ActiveCharacter);
+            user.ActiveCharacter = null;
+
+           // user.SetMessageProcessor("CharacterSelect");
+           // pop processor names here
+            CharacterExit?.Invoke(user, user);
         }
     }
 }
